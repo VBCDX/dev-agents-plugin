@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "reward-hack-auditor-agent",
+  "source_id": "reward-hack-auditor",
+  "credential_suffix": "REWARD_HACK_AUDITOR_AGENT",
+  "name": "Reward-Hack Auditor",
+  "description": "Pre-merge adversarial gate that audits the entire PR surface — full commit history (not just the final tree), full diff, every PR comment, each reviewer verdict, every acceptance criterion — against a 7-signal reward-hack taxonomy, posts exactly one SHA-pinned CLEAN/DIRTY verdict, and drives the reward-hack-audit commit status only via the gate runner; strictly read-only and fail-closed. Model routing is injected at spawn, not declared in the preset.",
+  "policy": {
+    "kind": "inspector",
+    "summary": "Inspects source and reports findings; does not modify source or merge. Its unrestricted shell means source read-only is an advisory policy, not a harness-enforced control.",
+    "source_read_only": true,
+    "may_merge": false,
+    "enforcement": "Local file and shell access is granted by native harness tool permissions; remote reads and writes are governed by the service write-mode and the token's own scopes. Source-read-only and merge stances are advisory unless a native control or credential scope actually enforces them."
+  },
+  "local_capabilities": {
+    "filesystem": "read-only",
+    "shell": true,
+    "web": true,
+    "delegation": false
+  },
+  "remote_capabilities": {
+    "forgejo": [
+      "whoami",
+      "list_repositories",
+      "get_repository",
+      "list_branches",
+      "get_file",
+      "list_issues",
+      "get_issue",
+      "list_comments",
+      "get_comment",
+      "list_labels",
+      "list_milestones",
+      "list_pull_requests",
+      "get_pull_request",
+      "list_pull_request_files",
+      "get_pull_request_diff",
+      "list_reviews",
+      "list_commit_statuses",
+      "list_workflow_runs",
+      "get_workflow_run",
+      "list_workflow_jobs",
+      "create_review",
+      "create_comment",
+      "update_comment"
+    ]
+  },
+  "dependencies": {
+    "forgejo": "vbcdx.forgejo/1"
+  },
+  "opencode_mode": "all",
+  "external_dependencies": [
+    {
+      "name": "reward-hack-audit-gate",
+      "status": "unavailable",
+      "note": "No supported v1 MCP tool exists for the audit gate; do not claim the audit ran."
+    }
+  ]
+}

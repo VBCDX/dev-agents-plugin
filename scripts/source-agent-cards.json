@@ -1,0 +1,1020 @@
+{
+  "all-tools": {
+    "name": "All Tools",
+    "description": "General-purpose coding agent with every tool row enabled \u2014 broad toolset access (shell, filesystem, background jobs, skills, goals, plan mode, compaction, web) plus delegation and workflows, and the optional codex and claude-code product subagent tools, which appear automatically once their providers register. Model routing is injected at spawn, not declared in the preset.",
+    "skills": [
+      {
+        "id": "broad-toolset-access",
+        "name": "Broad toolset access",
+        "description": "Shell, filesystem, and search tools, background job controls, skills, todos, and ask-user, all enabled in one preset.",
+        "tags": [
+          "shell",
+          "filesystem",
+          "background-jobs",
+          "skills"
+        ]
+      },
+      {
+        "id": "delegation",
+        "name": "Delegation to subagents",
+        "description": "Delegate self-contained work to spawn or fork subagents and list live agents, with the optional codex and claude-code product subagents self-registering when their providers appear.",
+        "tags": [
+          "subagents",
+          "delegation",
+          "fork",
+          "product-subagents"
+        ]
+      },
+      {
+        "id": "workflows",
+        "name": "Multi-agent workflows",
+        "description": "Orchestrate work at scale with workflow scripts that fan work out across subagents, and run iterative fresh-agent Ralph loops toward one objective.",
+        "tags": [
+          "workflows",
+          "orchestration",
+          "ralph"
+        ]
+      },
+      {
+        "id": "goals-and-planning",
+        "name": "Goals and plan mode",
+        "description": "Track long-running completion goals across rounds and produce decision-complete plans in plan mode, submitted for approval through exit_plan_mode.",
+        "tags": [
+          "goals",
+          "plan-mode",
+          "planning"
+        ]
+      },
+      {
+        "id": "web-search",
+        "name": "Web search",
+        "description": "Search the web for current information and cite the source URLs; web access is enabled for this preset.",
+        "tags": [
+          "web",
+          "search",
+          "current-information"
+        ]
+      },
+      {
+        "id": "context-compaction",
+        "name": "Context compaction",
+        "description": "Automatic compaction with tool-result pruning keeps long sessions within the context window; /compact is available on demand.",
+        "tags": [
+          "compaction",
+          "context-management"
+        ]
+      }
+    ],
+    "persona_style": ">",
+    "persona_bytes": 89
+  },
+  "code-agent": {
+    "name": "Code Agent",
+    "description": "Focused implementer that turns issue specifications into clean, tested, production-quality code on issue branches only \u2014 PR-first draft flow with WIP: gating, foreground CI polling, [agent-update] milestones, and hard boundaries (never pushes to main, force-pushes, merges PRs, or reviews code). Model routing is injected at spawn, not declared in the preset.",
+    "skills": [
+      {
+        "id": "issue-implementation",
+        "name": "Implement an issue",
+        "description": "Turn an issue specification into working, tested, production-quality code on an issue/<N>-<slug> branch, with one logical change per conventional commit and tests for every change.",
+        "tags": [
+          "implementation",
+          "code-host",
+          "testing",
+          "conventional-commits"
+        ]
+      },
+      {
+        "id": "pr-first-delivery",
+        "name": "PR-first draft flow",
+        "description": "Push slices early, open a WIP: draft PR immediately after the first push (Refs #N, never Closes/Fixes), and gate the draft-to-ready transition strictly on green CI at the current head SHA.",
+        "tags": [
+          "pull-request",
+          "draft-flow",
+          "ci-gate"
+        ]
+      },
+      {
+        "id": "ci-polling",
+        "name": "Foreground CI polling",
+        "description": "Poll the head SHA's CI status to a terminal state in the foreground, re-capturing the SHA after every re-push, and on the poll ceiling post a blocked [agent-update] milestone and leave the PR a draft.",
+        "tags": [
+          "ci",
+          "polling",
+          "milestones"
+        ]
+      },
+      {
+        "id": "agent-milestones",
+        "name": "[agent-update] milestones",
+        "description": "Post [agent-update] plan-formed, solution-identified, draft-pr-opened, blocked, pr-ready, and final milestones as each is reached, never batched, so other agents and humans can track progress.",
+        "tags": [
+          "milestones",
+          "coordination",
+          "progress-reporting"
+        ]
+      }
+    ],
+    "persona_style": "|",
+    "persona_bytes": 3939
+  },
+  "copywriter-content": {
+    "name": "Copywriter Content",
+    "description": "Long-form content drafter that consumes a content brief (persona, topic, factual inputs, optional VOC data), binds to your team's voice anchor, and drafts hook-body-close prose \u2014 blog, Substack, video/podcast script, case-study, or LinkedIn longpost \u2014 under the SOUL ban lists, 12-point anti-AI-tell gate, and concrete-specificity mandate, delivered as an issue comment for human review with [agent-update] milestones; strictly read-only \u2014 never writes repo files, pushes, commits, merges, or publishes, no short-form copy, no invented facts. Model routing is injected at spawn, not declared in the preset.",
+    "skills": [
+      {
+        "id": "longform-drafting",
+        "name": "Long-form content drafting",
+        "description": "Consume the content brief (persona, topic, factual inputs, optional VOC data) and draft hook-body-close prose in the brief's content type \u2014 blog post, Substack draft, video/podcast script, case-study narrative, or LinkedIn longpost \u2014 grounded only in the brief's factual inputs, with [VISUAL: ...] placeholders wherever a visual carries the point and exactly one CTA plus the CTA placeholder marker.",
+        "tags": [
+          "content-drafting",
+          "hook-body-close",
+          "longform",
+          "brief-intake"
+        ]
+      },
+      {
+        "id": "voice-anchor-binding",
+        "name": "Voice anchor binding",
+        "description": "Fetch and read your team's voice anchor (the canonical issue/comment your team documents, referenced in the brief) before writing anything \u2014 it is the binding voice standard, not optional flavor; if the fetch fails, flag at the top of the draft that the full anchor was not loaded, and if it is unreachable at all, do not proceed and report the failure.",
+        "tags": [
+          "voice-anchor",
+          "brand-voice",
+          "fetch-discipline"
+        ]
+      },
+      {
+        "id": "anti-ai-tell-gate",
+        "name": "Anti-AI-tell gate and specificity mandate",
+        "description": "Run the 12-point anti-AI-tell checklist and the banned-vocabulary ban list over the full draft: concrete specificity (every number exact or flagged, no hedging, no filler), varied rhythm, no hyper-symmetry \u2014 regenerate the full draft rather than patching when the check catches more than three violations.",
+        "tags": [
+          "anti-ai-tell",
+          "editing-gate",
+          "specificity",
+          "banned-vocabulary"
+        ]
+      },
+      {
+        "id": "issue-comment-delivery",
+        "name": "Issue-comment delivery with milestones",
+        "description": "Post the draft as a comment on the brief's issue via the code-host API and post [agent-update] plan-formed, solution-identified, blocked, and final milestones as each is reached, never batched \u2014 strictly read-only: never writes repo files, pushes, commits, merges, or publishes.",
+        "tags": [
+          "delivery",
+          "issue-comments",
+          "milestones",
+          "read-only"
+        ]
+      }
+    ],
+    "persona_style": "|",
+    "persona_bytes": 15754
+  },
+  "copywriter-marketing": {
+    "name": "Copywriter Marketing",
+    "description": "Short-form marketing & UX copy generator that consumes a copy assignment (brief, audience, format, constraints, optional VOC data), binds to your team's voice anchor, and generates N\u22653 structurally distinct angle-labeled variants per deliverable \u2014 ads, microcopy, transactional email, landing hero/CTA \u2014 inside the platform character-constraint tables with inline counts, under the SOUL ban lists, 12-point anti-AI-tell gate, and concrete-specificity mandate, delivered as an issue comment for human review with [agent-update] milestones; strictly read-only \u2014 never writes code or repo files, pushes, commits, merges, or publishes, and never attempts long-form. Model routing is injected at spawn, not declared in the preset.",
+    "skills": [
+      {
+        "id": "shortform-variant-generation",
+        "name": "Short-form variant generation",
+        "description": "Generate N\u22653 structurally distinct, angle-labeled variants per deliverable \u2014 ads, microcopy, transactional email, landing hero/CTA \u2014 one variant per creative angle (benefit-led, pain-point, social-proof, contrarian, specificity-led, or the angles the PM specifies), written from the reader persona's situation with distinct structures, never synonym swaps.",
+        "tags": [
+          "variant-generation",
+          "creative-angles",
+          "ads",
+          "microcopy"
+        ]
+      },
+      {
+        "id": "platform-constraint-compliance",
+        "name": "Platform character-constraint compliance",
+        "description": "Enforce the character and word limits of Google RSA, Meta, LinkedIn, Postmark transactional email, and UI microcopy \u2014 exceeding copy is rejected, not trimmed, not 'close enough'; count every constrained field and display the count inline, rewriting shorter rather than truncating when a field is over limit.",
+        "tags": [
+          "character-limits",
+          "platform-specs",
+          "inline-counts"
+        ]
+      },
+      {
+        "id": "voice-anchor-binding",
+        "name": "Voice anchor binding",
+        "description": "Fetch and read your team's voice anchor (the canonical issue/comment your team documents, referenced in the brief) before writing anything \u2014 it is the binding voice standard, not optional flavor; if the fetch fails, flag at the top of the deliverable that the full anchor was not loaded, and if it is unreachable at all, do not proceed and report the failure.",
+        "tags": [
+          "voice-anchor",
+          "brand-voice",
+          "fetch-discipline"
+        ]
+      },
+      {
+        "id": "anti-ai-tell-gate",
+        "name": "Anti-AI-tell gate and CTA discipline",
+        "description": "Run the banned-vocabulary and banned-phrase scans plus the 12-point anti-AI-tell checklist over every draft, with one CTA per piece stated as a command, no 'we' in the first sentence, and concrete specificity (every number exact or flagged, no hedging, no filler); regenerate offending sentences and re-run the mandatory final-pass self-check until the draft is clean.",
+        "tags": [
+          "anti-ai-tell",
+          "editing-gate",
+          "cta-discipline",
+          "banned-vocabulary"
+        ]
+      },
+      {
+        "id": "issue-comment-delivery",
+        "name": "Issue-comment delivery with milestones",
+        "description": "Post the structured deliverable as a comment on the brief's issue via the code-host API (repo-scoped base from CODE_HOST_URL, HTTP Basic as the agent's own identity) and post [agent-update] plan-formed, solution-identified, blocked, and final milestones as each is reached, never batched \u2014 strictly read-only: never writes code or repo files, pushes, commits, merges, or publishes.",
+        "tags": [
+          "delivery",
+          "issue-comments",
+          "milestones",
+          "read-only"
+        ]
+      }
+    ],
+    "persona_style": "|",
+    "persona_bytes": 22773
+  },
+  "crazy-ivan": {
+    "name": "Crazy Ivan",
+    "description": "Exact-head adversarial auditor of every assigned PR before merge \u2014 audits both the code and the review that approved it, files evidence-grounded issues (file:line + quoted code, grouped intelligently), and posts a machine-parsed `IVAN VERDICT:` summary pinned to the audited head SHA. Strictly read-only. Model routing is injected at spawn, not declared in the preset.",
+    "skills": [
+      {
+        "id": "exact-head-audit",
+        "name": "Exact-head PR audit",
+        "description": "Audit the PR assigned at spawn at its exact current head SHA before merge \u2014 every PR receives the audit, selection and substitution are forbidden, and a moved or unavailable head fails closed on a fresh assignment.",
+        "tags": [
+          "audit",
+          "pull-request",
+          "read-only",
+          "code-host"
+        ]
+      },
+      {
+        "id": "review-quality-audit",
+        "name": "Audit the approving review",
+        "description": "Evaluate the review that approved the PR \u2014 thoroughness, substance, standards compliance, missed issues, rubber-stamp detection, and the mandatory evidence-grounding check of every AC verdict row, including docs-only PRs.",
+        "tags": [
+          "code-review",
+          "quality",
+          "evidence"
+        ]
+      },
+      {
+        "id": "evidence-grounded-findings",
+        "name": "Evidence-grounded issues",
+        "description": "File an issue for every finding with a file:line citation and a verbatim quoted code fence, grouped intelligently \u2014 small related items in one issue, large items separately. Never write code, open PRs, or attach patches.",
+        "tags": [
+          "issues",
+          "code-host",
+          "evidence",
+          "reporting"
+        ]
+      },
+      {
+        "id": "ivan-verdict",
+        "name": "IVAN VERDICT summary",
+        "description": "Post the machine-parsed audit summary on the audited PR \u2014 first line exactly IVAN VERDICT: <WORD> from the allowlist, body containing the head SHA in a ### Head section, plus code and review quality assessments and the issues filed.",
+        "tags": [
+          "verdict",
+          "machine-parsed",
+          "reporting"
+        ]
+      },
+      {
+        "id": "completion-recording",
+        "name": "Completion recording",
+        "description": "Immediately after posting the summary, record the PR as completed in the ivan state file via ivan_state_mark with the same verdict word and the audited head SHA, so the scanner never re-spawns a redundant audit.",
+        "tags": [
+          "state",
+          "scanner",
+          "coordination"
+        ]
+      }
+    ],
+    "persona_style": "|",
+    "persona_bytes": 13380
+  },
+  "designer-agent": {
+    "name": "Designer Agent",
+    "description": "Advisory UX reviewer for git-hosted projects that conducts a proxy experience for every user-facing change (CLI/API ergonomics, documentation clarity, WCAG 2.1 AA accessibility, visual design) and files prioritized `## Design Review` feedback as code-host comments \u2014 strictly read-only, never writes code, pushes, merges, or blocks; optionally generates design images with the PM-authorized image-generation model and attaches them to the issue. Model routing is injected at spawn, not declared in the preset.",
+    "skills": [
+      {
+        "id": "ux-proxy-review",
+        "name": "Proxy-experience UX review",
+        "description": "Walks the user's complete journey step by step for every review, evaluates CLI/API ergonomics, documentation clarity, and visual design against Nielsen's heuristics and modern UX practice, and targets WCAG 2.1 AA at minimum \u2014 every recommendation grounded in evidence (a heuristic, a WCAG criterion, or a design principle), with untested assumptions flagged for validation.",
+        "tags": [
+          "ux",
+          "usability",
+          "accessibility",
+          "wcag-2.1-aa",
+          "documentation"
+        ]
+      },
+      {
+        "id": "prioritized-design-feedback",
+        "name": "Prioritized Design Review feedback",
+        "description": "Files one structured `## Design Review` comment with three priority tiers (critical / recommended / minor), every item stating WHAT, WHY, and HOW, plus a What Works Well section, signed off as advisory and never blocking \u2014 and posts a brief skip comment when a change has no user-facing impact.",
+        "tags": [
+          "feedback",
+          "design-review",
+          "prioritization",
+          "advisory"
+        ]
+      },
+      {
+        "id": "head-sha-pinning",
+        "name": "Head-SHA-pinned PR reviews",
+        "description": "Resolves the PR head SHA from the PR API at the start of a review, names it in the Design Review comment's opening line, and restarts the review if the head moves \u2014 feedback against a stale SHA is void by construction.",
+        "tags": [
+          "pull-request",
+          "review",
+          "head-sha"
+        ]
+      },
+      {
+        "id": "design-image-generation",
+        "name": "Design image generation and attachment",
+        "description": "Generates design images with the PM-authorized image-generation model \u2014 required for all design work, drafts included, never silently downgraded on a rate-limit or quota error \u2014 saves each to a persistent per-issue workspace path, uploads it as an issue asset via the credential helper, and embeds the returned URL in the comment.",
+        "tags": [
+          "image-generation",
+          "design-assets",
+          "attachments"
+        ]
+      },
+      {
+        "id": "agent-milestones",
+        "name": "[agent-update] and [designer-agent] milestones",
+        "description": "Posts [agent-update] plan-formed, solution-identified, and blocked milestones as each is reached (never batched into an end-of-run dump) and, for image-generation runs, per-image [designer-agent] interim progress so long silent design runs always give a signal.",
+        "tags": [
+          "milestones",
+          "progress-reporting",
+          "coordination"
+        ]
+      }
+    ],
+    "persona_style": "|",
+    "persona_bytes": 11108
+  },
+  "devops-agent": {
+    "name": "DevOps Agent",
+    "description": "Infrastructure provisioner that turns issues into host bootstrap scripts, PaaS docker-compose configs, code-host webhooks, and infra documentation on issue branches only \u2014 pattern-first, least-privilege, everything validated before push, and live infrastructure only ever WRITTEN, never executed, without explicit PM approval.",
+    "skills": [
+      {
+        "id": "infra-as-code-authoring",
+        "name": "Author infrastructure as code",
+        "description": "Turn an issue into host bootstrap scripts, PaaS docker-compose configs, code-host webhook configurations, and infrastructure documentation on an issue/<N>-<slug> branch \u2014 pattern-first: read existing patterns in the team's infrastructure org before inventing, every config captured in a file, unscriptable steps documented in MANUAL_STEPS.md.",
+        "tags": [
+          "infrastructure-as-code",
+          "code-host",
+          "bootstrap-scripts",
+          "docker-compose",
+          "pattern-first"
+        ]
+      },
+      {
+        "id": "deploy-from-vcs",
+        "name": "Deploy-from-VCS orchestration",
+        "description": "Author compose files that work entirely within the PaaS model \u2014 pulls from the VCS, webhook-triggered deploys, pinned image versions (never `latest`), health checks, restart policies, named volumes \u2014 with no assumptions about host paths, manual container creation, or out-of-band orchestration.",
+        "tags": [
+          "deployment",
+          "vcs",
+          "webhooks",
+          "paas",
+          "image-pinning"
+        ]
+      },
+      {
+        "id": "firewall-secrets-hygiene",
+        "name": "Firewall and secrets hygiene",
+        "description": "Apply least privilege and smallest surface: default-deny firewall with explicit allows, minimum users and file permissions (never chmod 777), environment variable references only with no secrets or credential values anywhere, and a hardcoded-secret grep of the diff before every push.",
+        "tags": [
+          "firewall",
+          "secrets",
+          "least-privilege",
+          "hardening"
+        ]
+      },
+      {
+        "id": "live-infra-gating",
+        "name": "Live-infrastructure gating",
+        "description": "Treat all live infrastructure (PaaS mutations, container creation, firewall changes, database users) as read-only: write the full-parameter commands and a PM-executed Deployment Steps checklist into the PR, and wait for explicit PM approval before anything runs.",
+        "tags": [
+          "approval-gate",
+          "read-only",
+          "deployment-steps",
+          "pm-approval"
+        ]
+      },
+      {
+        "id": "rollback-incident-handling",
+        "name": "Rollback and incident handling",
+        "description": "Ship every change with a rollback procedure, post [agent-update] milestones as they are reached (blocked posted immediately when the blocker is hit), and handle failures \u2014 unreachable PaaS or container-host APIs, validation failures, merge conflicts on possibly-deployed configs \u2014 with explicit documented next steps.",
+        "tags": [
+          "rollback",
+          "incident-handling",
+          "milestones",
+          "failure-handling"
+        ]
+      }
+    ],
+    "persona_style": "|",
+    "persona_bytes": 9792
+  },
+  "instructional-designer-agent": {
+    "name": "Instructional Designer Agent",
+    "description": "Learning-experience designer for git-hosted projects that turns a curriculum issue (audience persona, session format, industry context, topic, duration) into Backward-Design structure \u2014 Mager ABCD Bloom's-tagged objectives, retrieval-practice cadence, worked-example sequences, Day 1/7/30 reinforcement \u2014 filed as issue comments with [FACILITATOR]/[VERIFY]/[HANDOFF] markers, never fabricating case studies or tool claims. Model routing is injected at spawn, not declared in the preset.",
+    "skills": [
+      {
+        "id": "workshop-curriculum-design",
+        "name": "Design a workshop curriculum",
+        "description": "Turn a curriculum assignment (audience, format, topic, duration) into a Backward-Design module structure: desired performance outcomes first, then formative evidence, then time-boxed activities whose totals equal the session duration \u00b15 min.",
+        "tags": [
+          "curriculum",
+          "backward-design",
+          "workshop",
+          "instructional-design"
+        ]
+      },
+      {
+        "id": "learning-objectives",
+        "name": "Write learning objectives",
+        "description": "Write Mager ABCD learning objectives (Audience, Behavior, Condition, Degree) tagged with their Bloom's level, enforce a rising Bloom's progression across the session arc, and reject unmeasurable verbs like understand, learn, or know.",
+        "tags": [
+          "learning-objectives",
+          "mager-abcd",
+          "blooms-taxonomy"
+        ]
+      },
+      {
+        "id": "assessment-design",
+        "name": "Design assessment and reinforcement",
+        "description": "Build the assessment layer: no-notes retrieval checks every 15\u201320 minutes of exposition, formative checks every 20\u201330 minutes, observable-behavior rubrics, and the Day 1/7/30 post-session reinforcement plan.",
+        "tags": [
+          "assessment",
+          "retrieval-practice",
+          "formative-checks",
+          "rubrics"
+        ]
+      },
+      {
+        "id": "content-structuring",
+        "name": "Structure participant content",
+        "description": "Generate lesson plans, two-column facilitator scripts, slide outlines, workbooks, job aids, and run-of-shows as reliable scaffolding \u2014 with [FACILITATOR] placeholders and [VERIFY] flags where real content or unverified tool claims would go.",
+        "tags": [
+          "content-structuring",
+          "facilitator-scripts",
+          "job-aids",
+          "placeholders"
+        ]
+      },
+      {
+        "id": "persona-gated-framing",
+        "name": "Persona-gated framing",
+        "description": "Gate every deliverable against the five audience archetypes (Operator, IT Director, Founder, Community Anchor, Frontline Analyst), stop and ask when the audience does not map, and design branch points instead of averaging conflicting persona needs.",
+        "tags": [
+          "personas",
+          "audience-analysis",
+          "differentiation"
+        ]
+      }
+    ],
+    "persona_style": "|",
+    "persona_bytes": 18024
+  },
+  "market-research-agent": {
+    "name": "Market Research Agent",
+    "description": "Read-only technology researcher for git-hosted projects \u2014 researches technology choices, evaluates vendors and services, and performs competitive analysis, delivering evidence-cited structured reports (Options Evaluated, Comparison Matrix, Recommendation, Implementation Considerations, Sources) as issue comments or standalone issues. Strictly read-only: never writes code, pushes, modifies files, merges, or makes purchasing decisions.",
+    "skills": [
+      {
+        "id": "market-analysis",
+        "name": "Market & technology analysis",
+        "description": "Research technology choices and vendor options against the actual deployment environment, producing a structured report with an Executive Summary, Options Evaluated, a Comparison Matrix, a Recommendation, and Implementation Considerations \u2014 findings clearly separated from recommendations.",
+        "tags": [
+          "market-analysis",
+          "research",
+          "structured-reports",
+          "comparison-matrix"
+        ]
+      },
+      {
+        "id": "vendor-evaluation",
+        "name": "Vendor & service evaluation",
+        "description": "Evaluate vendors and services on pricing model and free-tier limits (not just the headline number), community adoption (stars, downloads, last release), total cost of adoption, and compatibility with your existing stack \u2014 PaaS, container host, VCS, secrets manager.",
+        "tags": [
+          "vendor-evaluation",
+          "pricing",
+          "adoption-cost",
+          "compatibility"
+        ]
+      },
+      {
+        "id": "competitive-research",
+        "name": "Competitor research",
+        "description": "Perform competitive analysis focused on messaging, feature differentiation, and market gaps \u2014 not generic SWOT templates \u2014 grounded in sourced findings about competitor positioning and product strategy.",
+        "tags": [
+          "competitive-analysis",
+          "positioning",
+          "market-gaps"
+        ]
+      },
+      {
+        "id": "sourced-findings",
+        "name": "Sourced findings",
+        "description": "Cite every finding with a URL \u2014 documentation, pricing pages, benchmark data, community adoption metrics \u2014 label uncitable claims as assumptions for validation, and separate facts from recommendations in the report.",
+        "tags": [
+          "citations",
+          "evidence",
+          "findings"
+        ]
+      },
+      {
+        "id": "agent-milestones",
+        "name": "[agent-update] milestones",
+        "description": "Post [agent-update] plan-formed, solution-identified, blocked, and final milestones on the requesting issue as each is reached \u2014 never batched; blocked is posted immediately the moment the blocker is hit.",
+        "tags": [
+          "milestones",
+          "coordination",
+          "progress-reporting"
+        ]
+      }
+    ],
+    "persona_style": "|",
+    "persona_bytes": 11458
+  },
+  "pm-agent": {
+    "name": "PM Agent",
+    "description": "Interactive orchestrator of the development pipeline for git-hosted projects \u2014 creates issues with testable acceptance criteria, spawns implementation/review/design agents with per-role routing overrides, consumes [agent-update] milestones and head-SHA-pinned verdicts, sweeps the full backlog hourly, and is the only role that squash-merges approved, AC-validated work. Model routing is injected at spawn, not declared in the preset.",
+    "skills": [
+      {
+        "id": "issue-definition",
+        "name": "Define issues with testable acceptance criteria",
+        "description": "Turn needed work into issues with a clear title, testable acceptance criteria, context links, and enough detail that a fresh agent can execute without guessing \u2014 rework an underspecified issue before assigning it, never after.",
+        "tags": [
+          "issues",
+          "acceptance-criteria",
+          "planning",
+          "code-host"
+        ]
+      },
+      {
+        "id": "agent-orchestration",
+        "name": "Spawn and coordinate agents",
+        "description": "Delegate implementation to the Code Agent, review to the Review Agent, and design feedback to the Designer Agent, with the claim-then-spawn guard, unique per-invocation workdirs, resume-don't-respawn, wave coordination comments, and the concurrency cap with its health gate.",
+        "tags": [
+          "orchestration",
+          "delegation",
+          "subagents",
+          "coordination"
+        ]
+      },
+      {
+        "id": "validation-and-merge",
+        "name": "Validate outcomes and merge",
+        "description": "Validate the final diff against the original issue's acceptance criteria, act as the tiebreaker when reviewer and coder disagree, and squash-merge only approved, non-drifted work \u2014 the PM is the only role that merges, and never writes implementation code.",
+        "tags": [
+          "validation",
+          "merge-ownership",
+          "acceptance-criteria",
+          "pull-request"
+        ]
+      },
+      {
+        "id": "verdict-consumption",
+        "name": "Consume head-SHA-pinned verdicts",
+        "description": "Track in-flight reviewers by spawn-id milestones (the Reviewer Milestone Consumer), disambiguate APPROVED/REQUEST_CHANGES verdicts by the head SHA they cite, and treat a lone adversarial CHANGES on money or privilege surfaces as blocking.",
+        "tags": [
+          "verdicts",
+          "head-sha-pinning",
+          "milestones",
+          "review"
+        ]
+      },
+      {
+        "id": "backlog-sweep",
+        "name": "Never-idle full-backlog sweep",
+        "description": "On each hourly heartbeat, sweep the entire open backlog across all tracked repos, bucket every issue/PR into human-blocked, in-flight, stale, or workable, close stale ones with a record comment, and spawn workable ones immediately up to the health-gated cap.",
+        "tags": [
+          "backlog",
+          "sweep",
+          "heartbeat",
+          "triage"
+        ]
+      },
+      {
+        "id": "human-decision_routing",
+        "name": "Route human decisions",
+        "description": "Turn every need for the human's input into a ticket assigned to the human's account the same turn the need arises \u2014 a dedicated human-decision issue for multi-fact trade-offs, a tagged comment for single-fact asks \u2014 with the assignee as the sole canonical blocked signal.",
+        "tags": [
+          "human-in-the-loop",
+          "triage",
+          "decisions",
+          "code-host"
+        ]
+      }
+    ],
+    "persona_style": "|",
+    "persona_bytes": 12715
+  },
+  "qa-agent": {
+    "name": "QA Agent",
+    "description": "Testing-posture owner that turns issue specifications into E2E, integration, and deployment-smoke test suites (or test-framework setup) on issue branches only \u2014 PR-first draft flow with WIP: gating, foreground CI polling, [agent-update] milestones, and hard boundaries (never writes unit tests, fixes app bugs, reviews or merges PRs, pushes to main, or touches production data). Model routing is injected at spawn, not declared in the preset.",
+    "skills": [
+      {
+        "id": "test-suite-authoring",
+        "name": "Author E2E and integration test suites",
+        "description": "Turn an issue specification into E2E, integration, and deployment-smoke test suites (or test-framework setup) on an issue/<N>-<slug> branch \u2014 the layer above unit tests, written against real services, deterministic, and self-cleaning.",
+        "tags": [
+          "testing",
+          "e2e",
+          "integration",
+          "code-host"
+        ]
+      },
+      {
+        "id": "deterministic-test-execution",
+        "name": "Deterministic test execution",
+        "description": "Run the suite on CI runners after push (never local npm install or npm test) with capped worker concurrency, and require every test to pass three runs in a row before pushing; a flaky test is root-caused, fixed, or removed \u2014 never committed.",
+        "tags": [
+          "testing",
+          "ci",
+          "determinism",
+          "flaky-tests"
+        ]
+      },
+      {
+        "id": "regression-verification",
+        "name": "Deployment regression verification",
+        "description": "Follow every deployment with a standalone smoke test (reachable service, 200 health endpoint, core operation works) and check the branch's earlier failed CI runs before declaring a suite non-flaky \u2014 integration bugs live at the seams, not the surfaces.",
+        "tags": [
+          "regression",
+          "smoke-tests",
+          "deployment",
+          "verification"
+        ]
+      },
+      {
+        "id": "evidence-based-findings",
+        "name": "Evidence-based findings",
+        "description": "Report only what the tests actually show: document each failure with evidence, file a separate issue for every application bug revealed, skip (never delete) the failing test with a reference to the bug's issue number, and keep production data and database queries strictly read-only.",
+        "tags": [
+          "evidence",
+          "bug-reporting",
+          "read-only",
+          "discipline"
+        ]
+      },
+      {
+        "id": "pr-first-delivery",
+        "name": "PR-first draft flow with foreground CI polling",
+        "description": "Push slices early, open a WIP: draft PR immediately after the first push (Refs #N, never Closes/Fixes), poll the head SHA's CI status to a terminal state in the foreground, and mark the PR ready only when CI is green on the current head SHA.",
+        "tags": [
+          "pull-request",
+          "draft-flow",
+          "ci-gate",
+          "polling"
+        ]
+      },
+      {
+        "id": "agent-milestones",
+        "name": "[agent-update] milestones",
+        "description": "Post [agent-update] plan-formed, solution-identified, draft-pr-opened, blocked, and pr-ready milestones as each is reached \u2014 never batched, and blocked the moment the blocker is hit \u2014 so the PM and other agents can track progress.",
+        "tags": [
+          "milestones",
+          "coordination",
+          "progress-reporting"
+        ]
+      }
+    ],
+    "persona_style": "|",
+    "persona_bytes": 9885
+  },
+  "review-agent": {
+    "name": "Review Agent",
+    "description": "Read-only pull-request reviewer that posts machine-parseable APPROVED / REQUEST_CHANGES verdicts via the code-host API \u2014 evidence-grounded AC verdict table (real file:line + quoted code fence per row), head-SHA pinning, runner-based CI verification, and hard boundaries (never writes code, pushes, merges, modifies files, or approves without AC evidence). Model routing is injected at spawn, not declared in the preset.",
+    "skills": [
+      {
+        "id": "pr-review",
+        "name": "Review a pull request end-to-end",
+        "description": "Clone into a per-invocation workspace, cross-reference the linked issue, walk the FULL diff file by file (correctness, security, test quality, readability, git hygiene), and post a decisive APPROVED or REQUEST_CHANGES verdict via the code-host API pinned to the head SHA.",
+        "tags": [
+          "pull-request",
+          "code-review",
+          "code-host",
+          "diff-walk"
+        ]
+      },
+      {
+        "id": "ac-verdict-table",
+        "name": "Evidence-grounded AC verdict table",
+        "description": "Build the mandatory acceptance-criteria verdict table mapping every AC to a real file:line and a quoted code fence, self-check it before posting, and downgrade to REQUEST_CHANGES if any AC lacks verifiable evidence.",
+        "tags": [
+          "acceptance-criteria",
+          "evidence",
+          "verification"
+        ]
+      },
+      {
+        "id": "independent-verification",
+        "name": "Independent re-derivation",
+        "description": "Re-derive every acceptance-criterion claim from the code itself rather than trusting the PR description or the author's assertions \u2014 if you cannot quote the code, the criterion is not met, and real problems are never waved through as 'not blocking'.",
+        "tags": [
+          "independence",
+          "re-derivation",
+          "evidence"
+        ]
+      },
+      {
+        "id": "cross-model-review",
+        "name": "Cross-model review",
+        "description": "Run the review with a model from a different family than the one that authored the change (via the spawn-time model route), so the reviewer is not biased by the authoring model's habits or blind spots.",
+        "tags": [
+          "cross-model",
+          "model-routing",
+          "code-review"
+        ]
+      },
+      {
+        "id": "head-sha-ci-verification",
+        "name": "Head-SHA CI verification",
+        "description": "Pin the PR head SHA at the start, verify the runner-based CI status of that exact SHA (wait to a terminal state, never approve on red CI), and abort with a re-review if HEAD moves mid-review.",
+        "tags": [
+          "ci",
+          "head-sha",
+          "verification"
+        ]
+      },
+      {
+        "id": "review-milestones",
+        "name": "Spawn-id-prefixed review milestones",
+        "description": "Post [agent-update] milestones and [review-agent #<spawn-id>] interim milestones (CI baseline, diff walk, AC table, verdict posting, blocker) as each phase is reached, so a PM scanner can distinguish a running review from a crashed one.",
+        "tags": [
+          "milestones",
+          "coordination",
+          "progress-reporting"
+        ]
+      }
+    ],
+    "persona_style": "|",
+    "persona_bytes": 15500
+  },
+  "reward-hack-auditor": {
+    "name": "Reward-Hack Auditor",
+    "description": "Pre-merge adversarial gate that audits the entire PR surface \u2014 full commit history (not just the final tree), full diff, every PR comment, each reviewer verdict, every acceptance criterion \u2014 against a 7-signal reward-hack taxonomy, posts exactly one SHA-pinned CLEAN/DIRTY verdict, and drives the reward-hack-audit commit status only via the gate runner; strictly read-only and fail-closed. Model routing is injected at spawn, not declared in the preset.",
+    "skills": [
+      {
+        "id": "full-surface-pr-audit",
+        "name": "Audit the entire PR surface",
+        "description": "Read every commit and the full diff across the whole PR history, every PR comment, each reviewer verdict, and every acceptance criterion in the linked issue \u2014 not just the final tree or the latest comment.",
+        "tags": [
+          "audit",
+          "pull-request",
+          "git-history",
+          "evidence"
+        ]
+      },
+      {
+        "id": "reward-hack-taxonomy",
+        "name": "Detect reward-hacking with the 7-signal taxonomy",
+        "description": "Classify the PR surface against the 7-signal taxonomy \u2014 masked or skipped quality gates, deferral language, dropped acceptance criteria, stale reviews, self-served pipelines, swallowed errors in code, and .env/secrets drift \u2014 blocking on any single hit.",
+        "tags": [
+          "reward-hacking",
+          "quality-gates",
+          "taxonomy",
+          "ci-config"
+        ]
+      },
+      {
+        "id": "independent-verification",
+        "name": "Verify reported success independently",
+        "description": "Independently re-fetch the head SHA, CI status, and reviewer verdicts and verify head_sha equals last_reviewed_sha for every required reviewer, so a green CI or an approval is trusted only when re-verified against the exact current head.",
+        "tags": [
+          "verification",
+          "reviews",
+          "head-sha",
+          "fail-closed"
+        ]
+      },
+      {
+        "id": "sha-pinned-verdicts",
+        "name": "Post SHA-pinned verdicts",
+        "description": "Post exactly one machine-parseable verdict \u2014 CLEAN or DIRTY pinned to the exact 40-character head SHA \u2014 with an evidence-grounded findings table citing real file:line, and void any prior verdict when the head moves.",
+        "tags": [
+          "verdict",
+          "sha",
+          "findings",
+          "pull-request"
+        ]
+      },
+      {
+        "id": "commit-status-gate",
+        "name": "Drive the reward-hack-audit commit status",
+        "description": "Drive the reward-hack-audit commit status only through the gate runner, so green is always the mechanical result of a CLEAN verdict on the exact current SHA and never hand-posted, and red stays red until a CLEAN audit exists for the current head.",
+        "tags": [
+          "commit-status",
+          "ci-gate",
+          "code-host"
+        ]
+      },
+      {
+        "id": "block-never-fix",
+        "name": "Block, never fix",
+        "description": "On findings, block the merge, add the blocked-for-human label, and assign the human account \u2014 never edit source, never push, never merge, never fix; the audit is strictly read-only and fail-closed.",
+        "tags": [
+          "readonly",
+          "merge-gate",
+          "boundaries"
+        ]
+      }
+    ],
+    "persona_style": "|",
+    "persona_bytes": 16494
+  },
+  "security-agent": {
+    "name": "Security Agent",
+    "description": "Read-only proactive security auditor that performs deep-dive audits across entire repositories and infrastructure configurations \u2014 version fingerprints, secret scans (current tree + git history), dependency CVEs, OWASP Top 10 code review, infra-config and access-control review \u2014 and files evidence-grounded issues with severity, file:line, quoted evidence, and remediation, plus a full audit summary. It never writes code, pushes, merges, rotates credentials, or touches production.",
+    "skills": [
+      {
+        "id": "version-fingerprinting",
+        "name": "Version fingerprinting",
+        "description": "Identify the exact deployed version of every vendor system in scope before making any behavior claim, record the fingerprints in the audit summary, and downgrade any version-dependent claim to unverified when a version cannot be determined.",
+        "tags": [
+          "fingerprinting",
+          "versioning",
+          "vendor-docs"
+        ]
+      },
+      {
+        "id": "secrets-scan",
+        "name": "Secrets scan (tree + git history)",
+        "description": "Scan the current tree AND git history for secrets \u2014 high-entropy strings, private key blocks, unignored .env files, and secrets in deleted files \u2014 on the principle that a committed secret is compromised even if later removed.",
+        "tags": [
+          "secrets",
+          "git-history",
+          "hygiene"
+        ]
+      },
+      {
+        "id": "dependency-audit",
+        "name": "Dependency vulnerability audit",
+        "description": "Run npm audit and CVE database checks across the dependency tree, flagging vulnerable packages and packages unmaintained for 12+ months, with manual package.json/lockfile review as the fallback when npm audit fails.",
+        "tags": [
+          "dependencies",
+          "cve",
+          "npm-audit"
+        ]
+      },
+      {
+        "id": "owasp-code-review",
+        "name": "OWASP Top 10 code review",
+        "description": "Threat-model the code against OWASP Top 10 (2021) \u2014 broken access control through SSRF \u2014 grounding every finding in a real file:line and quoted evidence fence rather than paraphrase.",
+        "tags": [
+          "owasp",
+          "code-review",
+          "threat-model",
+          "evidence"
+        ]
+      },
+      {
+        "id": "infra-config-review",
+        "name": "Infrastructure and access-control review",
+        "description": "Review infrastructure configuration posture \u2014 container-compose files, host bootstrap scripts, database, secrets manager, firewall, and SSH settings \u2014 plus access control: repo permissions, webhook secrets, read-only deployment keys, and minimum-scope API tokens.",
+        "tags": [
+          "infrastructure",
+          "access-control",
+          "hardening",
+          "configuration"
+        ]
+      },
+      {
+        "id": "evidence-based-findings",
+        "name": "Evidence-based findings and audit summary",
+        "description": "File each finding as a separate issue with severity, file:line, quoted evidence fence, and step-by-step remediation, then post the audit summary \u2014 fingerprints, unverified claims, findings table, severity distribution \u2014 with [agent-update] milestones posted as each is reached.",
+        "tags": [
+          "findings",
+          "evidence",
+          "reporting",
+          "milestones"
+        ]
+      }
+    ],
+    "persona_style": "|",
+    "persona_bytes": 11105
+  },
+  "user-research-agent": {
+    "name": "User Research Agent",
+    "description": "Proxy UX tester of live deployed applications \u2014 walks real user flows at the production URL (happy path, edge cases, error conditions, keyboard-only, narrow viewport), audits every surface against WCAG 2.1 AA, and files each distinct finding as a separate severity-rated issue plus a session-summary comment. Strictly read-only: never writes code, pushes, modifies files, merges, or reviews PR diffs.",
+    "skills": [
+      {
+        "id": "live-user-flow-testing",
+        "name": "Walk live user flows",
+        "description": "Test the deployed application at its production URL as a real user: common tasks, edge cases (empty/long/special-character inputs, back button, refresh, multiple tabs), error paths, keyboard-only, and narrow viewport, documenting each step with URL, action, expected and actual result.",
+        "tags": [
+          "ux-testing",
+          "user-flows",
+          "live-product",
+          "reproduction-steps"
+        ]
+      },
+      {
+        "id": "wcag-accessibility-audit",
+        "name": "WCAG 2.1 AA accessibility audit",
+        "description": "Evaluate every user-facing surface against WCAG 2.1 AA \u2014 Perceivable (contrast, text alternatives, semantic markup), Operable (keyboard access, focus order, target sizes), Understandable (labels, error messages), Robust (valid HTML, roles) \u2014 treating an inaccessible interface as a broken interface.",
+        "tags": [
+          "accessibility",
+          "wcag-2.1-aa",
+          "audit",
+          "keyboard-navigation"
+        ]
+      },
+      {
+        "id": "severity-rated-findings",
+        "name": "Severity-rated findings as issues",
+        "description": "File each distinct finding as a separate severity-rated issue (Critical/High/Medium/Low) with page URL, component, numbered steps to reproduce, expected vs actual behavior, the WCAG criterion violated, and a specific actionable fix \u2014 after checking existing open issues to avoid duplicates.",
+        "tags": [
+          "code-host",
+          "issue-filing",
+          "severity",
+          "findings"
+        ]
+      },
+      {
+        "id": "session-summary-reporting",
+        "name": "Session summary reporting",
+        "description": "Post a session-summary comment on the requesting issue: application tested, scope, a findings table (issue number, severity, one-line summary), overall assessment, and areas NOT covered for follow-up sessions.",
+        "tags": [
+          "reporting",
+          "session-summary",
+          "progress-reporting"
+        ]
+      },
+      {
+        "id": "agent-milestones",
+        "name": "[agent-update] milestones",
+        "description": "Post [agent-update] plan-formed, solution-identified, blocked, and final milestones on the requesting issue as each is reached \u2014 never batched; blocked is posted immediately the moment the blocker is hit.",
+        "tags": [
+          "milestones",
+          "coordination",
+          "progress-reporting"
+        ]
+      }
+    ],
+    "persona_style": "|",
+    "persona_bytes": 9113
+  },
+  "video-creator": {
+    "name": "Video Creator",
+    "description": "Short-form video producer for git-hosted projects \u2014 consumes a video brief (script or topic), binds to your product's voice anchor, authors a scene-by-scene shot plan with one generation prompt per scene, generates per-scene clips plus optional TTS narration and stills/b-roll at the highest quality the decided backends offer (no tiers, no caps, no silent substitution), assembles a single cut where the brief asks for one, and delivers drafts as an issue comment plus uploaded assets for human review with [agent-update] milestones; strictly read-only \u2014 never writes repo files, pushes, commits, merges, or publishes. Model routing is injected at spawn, not declared in the preset.",
+    "skills": [
+      {
+        "id": "brief-intake",
+        "name": "Brief intake",
+        "description": "Consume the video brief (script or topic, audience, platform/aspect ratio, brand/voice context, narration flag, deliverable form) before any billed generation; stop and ask on the issue when the brief or aspect ratio is missing, never spend billed generations on a guessed brief.",
+        "tags": [
+          "brief-intake",
+          "video-production",
+          "issue-workflow"
+        ]
+      },
+      {
+        "id": "shot-planning",
+        "name": "Scene-by-scene shot planning",
+        "description": "Author the shot plan before any generation is billed: one row per scene with duration, visual description, on-screen text, narration line, and the full generation prompt, carrying consistent style descriptors across scenes; bind every line to the product voice anchor first.",
+        "tags": [
+          "storyboard",
+          "shot-plan",
+          "prompt-design",
+          "voice-anchor"
+        ]
+      },
+      {
+        "id": "asset-generation",
+        "name": "Clip, narration, and stills generation",
+        "description": "Generate one clip per scene via the decided video-generation backend, optional TTS narration, and stills/b-roll via the team's image-generation script at the highest quality offered \u2014 no model ladder, no cheaper fallback, no silent substitution; a backend error or rate-limit posts [agent-update] blocked and stops the run.",
+        "tags": [
+          "video-generation",
+          "tts",
+          "stills",
+          "billed-generations"
+        ]
+      },
+      {
+        "id": "single-cut-assembly",
+        "name": "Single-cut assembly",
+        "description": "Where the brief asks for a single video, concatenate the clips in scene order with local ffmpeg, muxing the narration track across the full cut and re-encoding when clip parameters mismatch; deliver the clips unjoined when the brief wants scene-by-scene review.",
+        "tags": [
+          "assembly",
+          "ffmpeg",
+          "single-cut"
+        ]
+      },
+      {
+        "id": "delivery-and-milestones",
+        "name": "Draft delivery and milestones",
+        "description": "Upload every asset to the brief's issue, embed download URLs, post per-asset progress as each asset lands, and post [agent-update] plan-formed, solution-identified, blocked, and final milestones as each is reached, never batched \u2014 drafts go to human review and are never published.",
+        "tags": [
+          "delivery",
+          "issue-assets",
+          "milestones",
+          "human-review"
+        ]
+      }
+    ],
+    "persona_style": "|",
+    "persona_bytes": 13556
+  }
+}

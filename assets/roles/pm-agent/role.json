@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "id": "pm-agent",
+  "source_id": "pm-agent",
+  "credential_suffix": "PM_AGENT",
+  "name": "PM Agent",
+  "description": "Interactive orchestrator of the development pipeline for git-hosted projects — creates issues with testable acceptance criteria, spawns implementation/review/design agents with per-role routing overrides, consumes [agent-update] milestones and head-SHA-pinned verdicts, sweeps the full backlog hourly, and is the only role that squash-merges approved, AC-validated work. Model routing is injected at spawn, not declared in the preset.",
+  "policy": {
+    "kind": "coordinator",
+    "summary": "Coordinates the pipeline and performs the team's authorized review and merge workflow; takes no implementation assignments.",
+    "source_read_only": true,
+    "may_merge": true,
+    "enforcement": "Local file and shell access is granted by native harness tool permissions; remote reads and writes are governed by the service write-mode and the token's own scopes. Source-read-only and merge stances are advisory unless a native control or credential scope actually enforces them."
+  },
+  "local_capabilities": {
+    "filesystem": "read-only",
+    "shell": true,
+    "web": false,
+    "delegation": true
+  },
+  "remote_capabilities": {
+    "forgejo": [
+      "whoami",
+      "list_repositories",
+      "get_repository",
+      "list_branches",
+      "get_file",
+      "list_issues",
+      "get_issue",
+      "list_comments",
+      "get_comment",
+      "list_labels",
+      "list_milestones",
+      "list_pull_requests",
+      "get_pull_request",
+      "list_pull_request_files",
+      "get_pull_request_diff",
+      "list_reviews",
+      "list_commit_statuses",
+      "list_workflow_runs",
+      "get_workflow_run",
+      "list_workflow_jobs",
+      "create_issue",
+      "update_issue",
+      "set_issue_labels",
+      "create_comment",
+      "update_comment",
+      "create_pull_request",
+      "update_pull_request",
+      "merge_pull_request"
+    ],
+    "coolify": [
+      "health",
+      "version",
+      "list_applications",
+      "get_application",
+      "get_application_logs",
+      "list_application_envs",
+      "list_databases",
+      "get_database",
+      "list_services",
+      "get_service",
+      "list_projects",
+      "get_project",
+      "list_servers",
+      "get_server",
+      "list_resources",
+      "list_deployments",
+      "get_deployment"
+    ]
+  },
+  "dependencies": {
+    "forgejo": "vbcdx.forgejo/1",
+    "coolify": "vbcdx.coolify/1"
+  },
+  "opencode_mode": "primary"
+}

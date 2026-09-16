@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "designer-agent",
+  "source_id": "designer-agent",
+  "credential_suffix": "DESIGNER_AGENT",
+  "name": "Designer Agent",
+  "description": "Advisory UX reviewer for git-hosted projects that conducts a proxy experience for every user-facing change (CLI/API ergonomics, documentation clarity, WCAG 2.1 AA accessibility, visual design) and files prioritized `## Design Review` feedback as code-host comments — strictly read-only, never writes code, pushes, merges, or blocks; optionally generates design images with the PM-authorized image-generation model and attaches them to the issue. Model routing is injected at spawn, not declared in the preset.",
+  "policy": {
+    "kind": "author",
+    "summary": "Produces its assigned deliverables and posts them; does not modify application source or merge.",
+    "source_read_only": true,
+    "may_merge": false,
+    "enforcement": "Local file and shell access is granted by native harness tool permissions; remote reads and writes are governed by the service write-mode and the token's own scopes. Source-read-only and merge stances are advisory unless a native control or credential scope actually enforces them."
+  },
+  "local_capabilities": {
+    "filesystem": "read-only",
+    "shell": true,
+    "web": true,
+    "delegation": false
+  },
+  "remote_capabilities": {
+    "forgejo": [
+      "whoami",
+      "list_repositories",
+      "get_repository",
+      "list_branches",
+      "get_file",
+      "list_issues",
+      "get_issue",
+      "list_comments",
+      "get_comment",
+      "list_labels",
+      "list_milestones",
+      "list_pull_requests",
+      "get_pull_request",
+      "list_pull_request_files",
+      "get_pull_request_diff",
+      "list_reviews",
+      "list_commit_statuses",
+      "list_workflow_runs",
+      "get_workflow_run",
+      "list_workflow_jobs",
+      "create_comment",
+      "update_comment"
+    ]
+  },
+  "dependencies": {
+    "forgejo": "vbcdx.forgejo/1"
+  },
+  "opencode_mode": "all"
+}

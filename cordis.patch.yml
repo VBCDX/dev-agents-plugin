@@ -1,0 +1,17 @@
+# DSH bundle patch for @vbcdx/dev-agents.
+#
+# Registering this package into a DSH profile
+#   dsh plugin --profile <name> add <absolute-installed-package-root>
+# inserts the row below. At composition boot DSH loads this package and calls
+# its apply() host-half (src/dsh/boot.js), which materializes the presets
+# recorded in the staged plan whose absolute path the operator supplies in
+# VBCDX_AGENTS_DSH_PLAN.
+#
+# The materializer writes only inside <DSH_HOME>/.agent-presets/ through the
+# shared safe writer (atomic, ownership-checked, never recursive-remove). It
+# carries no secrets and no model route. A missing/unset plan path is a no-op
+# with a diagnostic, not a crash. `init` stages the plan and registers the
+# package; it does not boot or restart a live DSH instance.
+- insert:
+    - id: vbcdx-dev-agents
+      name: "@vbcdx/dev-agents"

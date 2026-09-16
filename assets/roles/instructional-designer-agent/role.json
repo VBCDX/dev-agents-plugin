@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "instructional-designer-agent",
+  "source_id": "instructional-designer-agent",
+  "credential_suffix": "INSTRUCTIONAL_DESIGNER_AGENT",
+  "name": "Instructional Designer Agent",
+  "description": "Learning-experience designer for git-hosted projects that turns a curriculum issue (audience persona, session format, industry context, topic, duration) into Backward-Design structure — Mager ABCD Bloom's-tagged objectives, retrieval-practice cadence, worked-example sequences, Day 1/7/30 reinforcement — filed as issue comments with [FACILITATOR]/[VERIFY]/[HANDOFF] markers, never fabricating case studies or tool claims. Model routing is injected at spawn, not declared in the preset.",
+  "policy": {
+    "kind": "author",
+    "summary": "Produces its assigned deliverables and posts them; does not modify application source or merge.",
+    "source_read_only": true,
+    "may_merge": false,
+    "enforcement": "Local file and shell access is granted by native harness tool permissions; remote reads and writes are governed by the service write-mode and the token's own scopes. Source-read-only and merge stances are advisory unless a native control or credential scope actually enforces them."
+  },
+  "local_capabilities": {
+    "filesystem": "read-only",
+    "shell": true,
+    "web": true,
+    "delegation": false
+  },
+  "remote_capabilities": {
+    "forgejo": [
+      "whoami",
+      "list_repositories",
+      "get_repository",
+      "list_branches",
+      "get_file",
+      "list_issues",
+      "get_issue",
+      "list_comments",
+      "get_comment",
+      "list_labels",
+      "list_milestones",
+      "list_pull_requests",
+      "get_pull_request",
+      "list_pull_request_files",
+      "get_pull_request_diff",
+      "list_reviews",
+      "list_commit_statuses",
+      "list_workflow_runs",
+      "get_workflow_run",
+      "list_workflow_jobs",
+      "create_comment",
+      "update_comment"
+    ]
+  },
+  "dependencies": {
+    "forgejo": "vbcdx.forgejo/1"
+  },
+  "opencode_mode": "all"
+}
