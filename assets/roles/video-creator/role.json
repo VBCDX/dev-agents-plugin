@@ -1,10 +1,9 @@
 {
   "schema_version": 1,
   "id": "video-creator",
-  "source_id": "video-creator",
   "credential_suffix": "VIDEO_CREATOR",
   "name": "Video Creator",
-  "description": "Short-form video producer for git-hosted projects — consumes a video brief (script or topic), binds to your product's voice anchor, authors a scene-by-scene shot plan with one generation prompt per scene, generates per-scene clips plus optional TTS narration and stills/b-roll at the highest quality the decided backends offer (no tiers, no caps, no silent substitution), assembles a single cut where the brief asks for one, and delivers drafts as an issue comment plus uploaded assets for human review with [agent-update] milestones; strictly read-only — never writes repo files, pushes, commits, merges, or publishes. Model routing is injected at spawn, not declared in the preset.",
+  "description": "Short-form video producer for git-hosted projects — consumes a video brief (script or topic), binds to your product's voice anchor, authors a scene-by-scene shot plan with one generation prompt per scene, generates per-scene clips plus optional TTS narration and stills/b-roll with the configured backends (never substituting one silently), assembles a single cut where the brief asks for one, and delivers drafts as an issue comment plus uploaded assets for human review with progress notes; strictly read-only — never writes repo files, pushes, commits, merges, or publishes.",
   "policy": {
     "kind": "author",
     "summary": "Produces its assigned deliverables and posts them; does not modify application source or merge.",
@@ -13,11 +12,12 @@
     "enforcement": "Local file and shell access is granted by native harness tool permissions; remote reads and writes are governed by the service write-mode and the token's own scopes. Source-read-only and merge stances are advisory unless a native control or credential scope actually enforces them."
   },
   "local_capabilities": {
-    "filesystem": "read-only",
+    "filesystem": "read-write",
     "shell": true,
     "web": true,
     "delegation": false
   },
+  "web_search": false,
   "remote_capabilities": {
     "forgejo": [
       "whoami",
@@ -36,6 +36,7 @@
       "list_pull_request_files",
       "get_pull_request_diff",
       "list_reviews",
+      "get_review",
       "list_commit_statuses",
       "list_workflow_runs",
       "get_workflow_run",

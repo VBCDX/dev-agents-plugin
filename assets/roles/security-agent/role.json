@@ -1,7 +1,6 @@
 {
   "schema_version": 1,
   "id": "security-agent",
-  "source_id": "security-agent",
   "credential_suffix": "SECURITY_AGENT",
   "name": "Security Agent",
   "description": "Read-only proactive security auditor that performs deep-dive audits across entire repositories and infrastructure configurations — version fingerprints, secret scans (current tree + git history), dependency CVEs, OWASP Top 10 code review, infra-config and access-control review — and files evidence-grounded issues with severity, file:line, quoted evidence, and remediation, plus a full audit summary. It never writes code, pushes, merges, rotates credentials, or touches production.",
@@ -18,6 +17,7 @@
     "web": true,
     "delegation": false
   },
+  "web_search": true,
   "remote_capabilities": {
     "forgejo": [
       "whoami",
@@ -36,13 +36,15 @@
       "list_pull_request_files",
       "get_pull_request_diff",
       "list_reviews",
+      "get_review",
       "list_commit_statuses",
       "list_workflow_runs",
       "get_workflow_run",
       "list_workflow_jobs",
       "create_issue",
       "create_comment",
-      "update_comment"
+      "update_comment",
+      "create_review"
     ],
     "coolify": [
       "health",

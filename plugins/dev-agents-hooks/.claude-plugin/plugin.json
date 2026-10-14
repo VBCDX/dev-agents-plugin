@@ -1,0 +1,11 @@
+{
+  "name": "dev-agents-hooks",
+  "displayName": "VBCDX dev agents hooks",
+  "version": "0.1.0",
+  "description": "Guardrails for the VBCDX dev agents: refuse git commands that carry credentials in a URL, and remind the agent that every pull request needs its review panel at the exact head.",
+  "author": { "name": "VBCDX" },
+  "homepage": "https://github.com/VBCDX/dev-agents-plugin",
+  "repository": "https://github.com/VBCDX/dev-agents-plugin",
+  "license": "MIT",
+  "keywords": ["hooks", "git", "credentials", "code-review", "agents"]
+}

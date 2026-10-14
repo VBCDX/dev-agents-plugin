@@ -1,10 +1,9 @@
 {
   "schema_version": 1,
   "id": "pm-agent",
-  "source_id": "pm-agent",
   "credential_suffix": "PM_AGENT",
   "name": "PM Agent",
-  "description": "Interactive orchestrator of the development pipeline for git-hosted projects — creates issues with testable acceptance criteria, spawns implementation/review/design agents with per-role routing overrides, consumes [agent-update] milestones and head-SHA-pinned verdicts, sweeps the full backlog hourly, and is the only role that squash-merges approved, AC-validated work. Model routing is injected at spawn, not declared in the preset.",
+  "description": "Interactive orchestrator of the development pipeline for git-hosted projects — creates issues with testable acceptance criteria, delegates implementation, review and design to agents, consumes progress notes and head-SHA-pinned verdicts, and is the only role that merges approved, AC-validated work.",
   "policy": {
     "kind": "coordinator",
     "summary": "Coordinates the pipeline and performs the team's authorized review and merge workflow; takes no implementation assignments.",
@@ -18,6 +17,7 @@
     "web": false,
     "delegation": true
   },
+  "web_search": true,
   "remote_capabilities": {
     "forgejo": [
       "whoami",
@@ -36,6 +36,7 @@
       "list_pull_request_files",
       "get_pull_request_diff",
       "list_reviews",
+      "get_review",
       "list_commit_statuses",
       "list_workflow_runs",
       "get_workflow_run",
@@ -48,7 +49,8 @@
       "create_pull_request",
       "update_pull_request",
       "merge_pull_request",
-      "create_repository"
+      "create_repository",
+      "set_commit_status"
     ],
     "coolify": [
       "health",

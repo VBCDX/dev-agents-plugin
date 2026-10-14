@@ -1,0 +1,13 @@
+Vendored from VBCDX/vbcdx at 009fd7b16993141186a277ab408e46096cfd8725, byte-identical.
+Replace with a devDependency on @vbcdx/vbcdx once it is published.
+test/vendor.test.js checks these hashes, so an edit here fails CI.
+
+b0b342c0f53024ee37b796ad8e91efc0b2bb9672c8f9823b333c15e5f90d09fa  src/packs/load.js
+7305f61b03a2f017d5ecda1cd4d1d54fedb7e5f269d35d017d454fc0a25b1335  src/overlays/overlay.js
+08e5dea1bdfac5648f881580a000660b7d74f34f42168e83e12db947f22c981b  src/roles/registry.js
+739a2b050a90c7b4e105bc9d5fcb7d3be61fe9376ade427f0564425ea847816a  src/install/locate.js
+20e15685c184597e72d80cb340767765dd5c9e84431238721f479225da375635  src/config/json.js
+5c499779346c734a845c46cdee3c3c549294ff6abad8fbedd17c33390614b786  src/errors.js
+5ad37897f263ad91f1440dd98f7b6f42f905942f9f931fad848f32322da9fd2d  schema/vbcdx-pack.schema.json
+e1168b6d1340cf540532f7c8c7a077f2dfaa431a3733c86a83a916e7843608e9  schema/vbcdx-role.schema.json
+687c175ab702a8f112a1275f4c31d6db540cce6c1a774c08a63b5e39580258fb  schema/vbcdx-overlay.schema.json

@@ -1,10 +1,9 @@
 {
   "schema_version": 1,
   "id": "instructional-designer-agent",
-  "source_id": "instructional-designer-agent",
   "credential_suffix": "INSTRUCTIONAL_DESIGNER_AGENT",
   "name": "Instructional Designer Agent",
-  "description": "Learning-experience designer for git-hosted projects that turns a curriculum issue (audience persona, session format, industry context, topic, duration) into Backward-Design structure — Mager ABCD Bloom's-tagged objectives, retrieval-practice cadence, worked-example sequences, Day 1/7/30 reinforcement — filed as issue comments with [FACILITATOR]/[VERIFY]/[HANDOFF] markers, never fabricating case studies or tool claims. Model routing is injected at spawn, not declared in the preset.",
+  "description": "Learning-experience designer for git-hosted projects that turns a curriculum issue (audience persona, session format, industry context, topic, duration) into Backward-Design structure — Mager ABCD Bloom's-tagged objectives, retrieval-practice cadence, worked-example sequences, Day 1/7/30 reinforcement — filed as issue comments with [FACILITATOR]/[VERIFY]/[HANDOFF] markers, never fabricating case studies or tool claims.",
   "policy": {
     "kind": "author",
     "summary": "Produces its assigned deliverables and posts them; does not modify application source or merge.",
@@ -18,6 +17,7 @@
     "web": true,
     "delegation": false
   },
+  "web_search": false,
   "remote_capabilities": {
     "forgejo": [
       "whoami",
@@ -36,6 +36,7 @@
       "list_pull_request_files",
       "get_pull_request_diff",
       "list_reviews",
+      "get_review",
       "list_commit_statuses",
       "list_workflow_runs",
       "get_workflow_run",

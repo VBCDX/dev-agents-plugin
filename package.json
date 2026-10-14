@@ -1,55 +1,48 @@
 {
-  "name": "@vbcdx/dev-agents",
-  "version": "0.1.0",
-  "description": "Installer for the sixteen canonical VBCDX development agents. One canonical prompt and role descriptor per role, rendered deterministically for DSH, Claude Code, Codex, and OpenCode. Installs useful agents with or without service credentials; never configures MCP servers itself.",
+  "name": "@vbcdx/dev-agents-plugin",
+  "version": "0.1.1",
+  "description": "The dev agent pack for vbcdx: sixteen development roles (prompt + descriptor each) and their skills, installed by vbcdx into Claude Code, Codex, OpenCode or Hermes Agent. Teams layer their own process on through overlay slots and variables.",
   "type": "module",
-  "bin": {
-    "vbcdx-dev-agents": "bin/vbcdx-dev-agents.js"
-  },
-  "main": "src/index.js",
   "exports": {
-    ".": "./src/index.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./vbcdx-pack.json": "./vbcdx-pack.json"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "files": [
-    "bin",
-    "src",
     "assets",
     "skills",
-    "cordis.patch.yml",
-    ".env.example",
-    "README.md"
+    "plugins",
+    ".claude-plugin",
+    "vbcdx-pack.json",
+    "README.md",
+    "LICENSE"
   ],
-  "dsh": {
-    "plugin": true,
-    "bundle": {
-      "patch": "./cordis.patch.yml"
-    }
-  },
   "scripts": {
     "test": "node --test",
-    "start": "node bin/a2a-server.js",
-    "lint": "node --check bin/vbcdx-dev-agents.js && node --check bin/a2a-server.js"
+    "lint": "node scripts/lint.mjs"
   },
   "keywords": [
     "vbcdx",
+    "vbcdx-pack",
     "agents",
-    "dsh",
     "claude-code",
     "codex",
     "opencode",
-    "installer"
+    "hermes"
   ],
   "author": "VBCDX",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {
-    "smol-toml": "^1.8.0",
-    "yaml": "^2.9.1"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VBCDX/dev-agents-plugin.git"
+  },
+  "homepage": "https://github.com/VBCDX/dev-agents-plugin#readme",
+  "bugs": {
+    "url": "https://github.com/VBCDX/dev-agents-plugin/issues"
   }
 }

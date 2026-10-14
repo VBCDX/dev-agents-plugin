@@ -1,7 +1,6 @@
 {
   "schema_version": 1,
   "id": "market-research-agent",
-  "source_id": "market-research-agent",
   "credential_suffix": "MARKET_RESEARCH_AGENT",
   "name": "Market Research Agent",
   "description": "Read-only technology researcher for git-hosted projects — researches technology choices, evaluates vendors and services, and performs competitive analysis, delivering evidence-cited structured reports (Options Evaluated, Comparison Matrix, Recommendation, Implementation Considerations, Sources) as issue comments or standalone issues. Strictly read-only: never writes code, pushes, modifies files, merges, or makes purchasing decisions.",
@@ -18,6 +17,7 @@
     "web": true,
     "delegation": false
   },
+  "web_search": true,
   "remote_capabilities": {
     "forgejo": [
       "whoami",
@@ -36,6 +36,7 @@
       "list_pull_request_files",
       "get_pull_request_diff",
       "list_reviews",
+      "get_review",
       "list_commit_statuses",
       "list_workflow_runs",
       "get_workflow_run",

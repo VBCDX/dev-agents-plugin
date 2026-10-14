@@ -1,0 +1,21 @@
+{
+  "description": "VBCDX dev agents hooks: credential-URL guard (PreToolUse) and review-panel reminder (PostToolUse).",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/scripts/credential-url-guard.mjs" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/scripts/review-panel-reminder.mjs" }
+        ]
+      }
+    ]
+  }
+}

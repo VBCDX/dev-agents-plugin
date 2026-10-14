@@ -1,0 +1,14 @@
+{
+  "name": "vbcdx",
+  "owner": { "name": "VBCDX" },
+  "description": "Claude Code plugins that ship with the VBCDX dev agents pack.",
+  "plugins": [
+    {
+      "name": "dev-agents-hooks",
+      "source": "./plugins/dev-agents-hooks",
+      "description": "Refuse git commands that carry credentials in a URL, and remind the agent that every pull request needs its review panel at the exact head.",
+      "category": "security",
+      "tags": ["hooks", "git", "credentials", "code-review"]
+    }
+  ]
+}
