@@ -1,10 +1,9 @@
 {
   "schema_version": 1,
   "id": "all-in-one-dev-agent",
-  "source_id": "all-tools",
   "credential_suffix": "ALL_IN_ONE_DEV_AGENT",
-  "name": "All Tools",
-  "description": "General-purpose coding agent with every tool row enabled — broad toolset access (shell, filesystem, background jobs, skills, goals, plan mode, compaction, web) plus delegation and workflows, and the optional codex and claude-code product subagent tools, which appear automatically once their providers register. Model routing is injected at spawn, not declared in the preset.",
+  "name": "All-in-One Dev Agent",
+  "description": "General-purpose development agent that carries the whole loop itself — understands an issue, designs an approach, implements and tests it, and opens a pull request for review — for when one capable agent suits better than a team of specialists.",
   "policy": {
     "kind": "generalist",
     "summary": "General development role spanning the full loop; opens pull requests but does not self-merge to shortcut review.",
@@ -18,6 +17,7 @@
     "web": true,
     "delegation": true
   },
+  "web_search": false,
   "remote_capabilities": {
     "forgejo": [
       "whoami",
@@ -36,6 +36,7 @@
       "list_pull_request_files",
       "get_pull_request_diff",
       "list_reviews",
+      "get_review",
       "list_commit_statuses",
       "list_workflow_runs",
       "get_workflow_run",

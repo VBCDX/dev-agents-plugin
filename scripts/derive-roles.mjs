@@ -1,6 +1,6 @@
 // Provenance / one-time derivation helper (NOT part of the runtime package).
 //
-// Emits assets/roles/<id>/role.json for all sixteen canonical roles from an
+// Emits assets/roles/<id>/role.json for every role vbcdx-pack.json lists, from an
 // explicit, reviewable capability table. The table is the source of truth: CI
 // regenerates the descriptors and fails on any drift, so change a capability
 // here and re-run this script — never edit role.json by hand. The table below is
@@ -14,10 +14,11 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { CANONICAL_IDS, SOURCE_TO_CANONICAL, idToSuffix } from "../src/roles/registry.js";
+import { ROLE_IDS, SOURCE_TO_CANONICAL, idToSuffix } from "./source-map.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const cards = JSON.parse(readFileSync(join(here, "source-agent-cards.json"), "utf8"));
+const CANONICAL_IDS = ROLE_IDS;
 const CANONICAL_TO_SOURCE = Object.fromEntries(
   Object.entries(SOURCE_TO_CANONICAL).map(([s, c]) => [c, s]),
 );
@@ -28,7 +29,7 @@ const FORGEJO = {
     "whoami", "list_repositories", "get_repository", "list_branches", "get_file",
     "list_issues", "get_issue", "list_comments", "get_comment", "list_labels",
     "list_milestones", "list_pull_requests", "get_pull_request",
-    "list_pull_request_files", "get_pull_request_diff", "list_reviews",
+    "list_pull_request_files", "get_pull_request_diff", "list_reviews", "get_review",
     "list_commit_statuses", "list_workflow_runs", "get_workflow_run", "list_workflow_jobs",
   ],
   COMMENT: ["create_comment", "update_comment"],
@@ -37,6 +38,13 @@ const FORGEJO = {
   PR_WRITE: ["create_pull_request", "update_pull_request"],
   REVIEW: ["create_review"],
   CI_WRITE: ["set_commit_status", "dispatch_workflow"],
+  // The panel coordinator is the single writer for its panel's statuses and
+  // labels; the panel's
+  // auditor roles stay verdict-only. Least privilege: the status write alone,
+  // split out of CI_WRITE so the grant carries no workflow dispatch. The
+  // audit status context itself is the team's own gate wiring
+  // (operator-env only) — this capability is the coordinator's generic write.
+  STATUS_WRITE: ["set_commit_status"],
   MERGE: ["merge_pull_request"],
   REPO_CREATE: ["create_repository"],
 };
@@ -62,6 +70,10 @@ function expand(catalog, groups) {
 // kind: implementer | coordinator | inspector | author | generalist
 // fs:   "read-write" grants native file WRITE/EDIT tools; "read-only" does not.
 // shell/web/delegation are native local capabilities.
+// webSearch: the role gets web search through the operator's own LiteLLM gateway on
+// harnesses that render it (Hermes: the web-litellm-search plugin), when the installer
+// config names a gateway. The roles that must check a claim against a cited source, and
+// market research, whose primary tool it is.
 // sourceReadOnly / mayMerge are policy stances (advisory unless the harness or
 // service credential actually enforces them — recorded honestly per role).
 const T = {
@@ -89,7 +101,10 @@ const T = {
   "crazy-ivan": {
     kind: "inspector", fs: "read-only", shell: true, web: true, delegation: false,
     sourceReadOnly: true, mayMerge: false, opencodeMode: "all",
-    forgejo: ["READS", "REVIEW", "COMMENT"], coolify: [],
+    webSearch: true,
+    // ISSUE_FILE: a finding that must outlive its PR is filed as an issue — the
+    // PR thread is lost when the PR closes.
+    forgejo: ["READS", "REVIEW", "COMMENT", "ISSUE_FILE"], coolify: [],
   },
   "designer-agent": {
     kind: "author", fs: "read-only", shell: true, web: true, delegation: false,
@@ -108,13 +123,17 @@ const T = {
   },
   "market-research-agent": {
     kind: "inspector", fs: "read-only", shell: true, web: true, delegation: false,
-    sourceReadOnly: true, mayMerge: false, opencodeMode: "all",
+    // webSearch: web search is this role's primary research tool (its prompt says so).
+    sourceReadOnly: true, mayMerge: false, opencodeMode: "all", webSearch: true,
     forgejo: ["READS", "COMMENT"], coolify: [],
   },
   "pm-agent": {
     kind: "coordinator", fs: "read-only", shell: true, web: false, delegation: true,
-    sourceReadOnly: true, mayMerge: true, opencodeMode: "primary",
-    forgejo: ["READS", "ISSUE_FILE", "ISSUE_MANAGE", "COMMENT", "PR_WRITE", "MERGE", "REPO_CREATE"], coolify: ["READS"],
+    sourceReadOnly: true, mayMerge: true, opencodeMode: "primary", webSearch: true,
+    // The coordinator is the per-panel single writer for statuses and
+    // labels — STATUS_WRITE adds the status write, ISSUE_MANAGE already carries
+    // the label write + assignee edit. The panel's auditors keep none of these.
+    forgejo: ["READS", "ISSUE_FILE", "ISSUE_MANAGE", "COMMENT", "PR_WRITE", "MERGE", "REPO_CREATE", "STATUS_WRITE"], coolify: ["READS"],
   },
   "qa-agent": {
     kind: "implementer", fs: "read-write", shell: true, web: false, delegation: false,
@@ -123,25 +142,25 @@ const T = {
   },
   "review-agent": {
     kind: "inspector", fs: "read-only", shell: true, web: true, delegation: false,
-    sourceReadOnly: true, mayMerge: false, opencodeMode: "all",
+    sourceReadOnly: true, mayMerge: false, opencodeMode: "all", webSearch: true,
     forgejo: ["READS", "REVIEW", "COMMENT"], coolify: [],
   },
   "reward-hack-auditor-agent": {
     kind: "inspector", fs: "read-only", shell: true, web: true, delegation: false,
     sourceReadOnly: true, mayMerge: false, opencodeMode: "all",
-    forgejo: ["READS", "REVIEW", "COMMENT"], coolify: [],
-    // The reward-hack audit gate itself is an external dependency with no
-    // distributable supported capability in the v1 service catalogs. It is
-    // recorded as unavailable and is NOT substituted with an invented tool.
-    externalDependencies: [
-      { name: "reward-hack-audit-gate", status: "unavailable",
-        note: "No supported v1 MCP tool exists for the audit gate; do not claim the audit ran." },
-    ],
+    // ISSUE_FILE: a DIRTY finding that must outlive its PR is filed as an issue,
+    // not left only in the verdict thread that is lost when the PR closes. The
+    // audit roles (this one, crazy-ivan and security-agent) all file such issues,
+    // so the grant is the recorded decision.
+    forgejo: ["READS", "REVIEW", "COMMENT", "ISSUE_FILE"], coolify: [],
   },
   "security-agent": {
     kind: "inspector", fs: "read-only", shell: true, web: true, delegation: false,
-    sourceReadOnly: true, mayMerge: false, opencodeMode: "all",
-    forgejo: ["READS", "ISSUE_FILE", "COMMENT"], coolify: ["READS"],
+    sourceReadOnly: true, mayMerge: false, opencodeMode: "all", webSearch: true,
+    // REVIEW: the audit brief requires ONE machine-parseable verdict as a review
+    // event on the PR, pinned to the head SHA; a comment-only binding could not
+    // satisfy it.
+    forgejo: ["READS", "ISSUE_FILE", "COMMENT", "REVIEW"], coolify: ["READS"],
   },
   "user-research-agent": {
     kind: "inspector", fs: "read-only", shell: true, web: true, delegation: false,
@@ -149,7 +168,9 @@ const T = {
     forgejo: ["READS", "ISSUE_FILE", "COMMENT"], coolify: [],
   },
   "video-creator": {
-    kind: "author", fs: "read-only", shell: true, web: true, delegation: false,
+    // fs read-write: the role saves every generated clip, still and narration to a
+    // workspace path before uploading it; it still never writes repository source.
+    kind: "author", fs: "read-write", shell: true, web: true, delegation: false,
     sourceReadOnly: true, mayMerge: false, opencodeMode: "all",
     forgejo: ["READS", "COMMENT"], coolify: [],
   },
@@ -178,7 +199,6 @@ for (const id of CANONICAL_IDS) {
   const role = {
     schema_version: 1,
     id,
-    source_id: srcName,
     credential_suffix: idToSuffix(id),
     name: card.name || id,
     description: card.description || "",
@@ -199,6 +219,7 @@ for (const id of CANONICAL_IDS) {
       web: t.web,
       delegation: t.delegation,
     },
+    web_search: Boolean(t.webSearch),
     remote_capabilities: {
       ...(forgejoTools.length ? { forgejo: forgejoTools } : {}),
       ...(coolifyTools.length ? { coolify: coolifyTools } : {}),

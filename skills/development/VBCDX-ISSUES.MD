@@ -57,14 +57,14 @@ Some questions only a specific person can answer. For those:
 - End with a plain "reply A/B/C" so acting on it is one line.
 
 ## Updates & comments
-- Say **what changed and what's next**, in human terms: *"Merged and deployed to staging; next is the review panel on #560."* Not a paste of the CI matrix or a transcript.
+- Say **what changed and what's next**, in human terms: *"Merged and deployed to staging; next is the security review."* Not a paste of the CI matrix or a transcript.
 - Status, not stream-of-consciousness — one update, the current state.
 - **Closing:** one or two plain sentences — why it's closed and what shipped / where.
 
 ## Nomenclature (keep it consistent)
 The rule is simple: **define your nomenclature once and use it consistently** — the same name for the same thing every time, glossed on first use so a newcomer can follow. Keep the actual list — your orgs/namespaces, your product and module names, your tenancy words (the unit that is your permission boundary) — in the project context file, not scattered across issues. Point at it; don't re-invent names per thread.
 
-**`Refs` not `Closes`.** Git hosts (GitHub, GitLab, Gitea/Forgejo) auto-close an issue when a commit message on *any* branch says `Closes #N` / `Fixes #N` — including a feature branch that isn't merged yet. Use `Refs #N` in commits and PR bodies to link without closing, and close issues deliberately after verifying the work actually shipped. (Your host's exact auto-close keywords are noted in the context file.)
+**`Refs` not `Closes`.** A closing keyword (`Closes #N` / `Fixes #N`) closes the issue: GitHub only when the change merges into the default branch, while Forgejo and Gitea act on it in a commit message or a PR description with no branch restriction in their docs — so a feature branch that isn't merged yet can close it. Use `Refs #N` in commits and PR bodies to link without closing, and close issues deliberately after verifying the work actually shipped. (Your host's exact auto-close keywords are noted in the context file.)
 
 ## Labels
 - **Park label** (from the context file) — marks an item as waiting on the decision-maker; pair it with the assignment. This is the durable "needs a decision" signal.

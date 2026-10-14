@@ -1,7 +1,6 @@
 {
   "schema_version": 1,
   "id": "user-research-agent",
-  "source_id": "user-research-agent",
   "credential_suffix": "USER_RESEARCH_AGENT",
   "name": "User Research Agent",
   "description": "Proxy UX tester of live deployed applications — walks real user flows at the production URL (happy path, edge cases, error conditions, keyboard-only, narrow viewport), audits every surface against WCAG 2.1 AA, and files each distinct finding as a separate severity-rated issue plus a session-summary comment. Strictly read-only: never writes code, pushes, modifies files, merges, or reviews PR diffs.",
@@ -18,6 +17,7 @@
     "web": true,
     "delegation": false
   },
+  "web_search": false,
   "remote_capabilities": {
     "forgejo": [
       "whoami",
@@ -36,6 +36,7 @@
       "list_pull_request_files",
       "get_pull_request_diff",
       "list_reviews",
+      "get_review",
       "list_commit_statuses",
       "list_workflow_runs",
       "get_workflow_run",

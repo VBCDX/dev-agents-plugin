@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "name": "dev-agents",
+  "description": "A development team of agent roles and skills, installed by vbcdx.",
+  "roles_dir": "assets/roles",
+  "roles": [
+    "all-in-one-dev-agent",
+    "code-agent",
+    "copywriter-content",
+    "copywriter-marketing",
+    "crazy-ivan",
+    "designer-agent",
+    "devops-agent",
+    "instructional-designer-agent",
+    "market-research-agent",
+    "pm-agent",
+    "qa-agent",
+    "review-agent",
+    "reward-hack-auditor-agent",
+    "security-agent",
+    "user-research-agent",
+    "video-creator"
+  ],
+  "skills_dir": "skills",
+  "contracts": [
+    "vbcdx.coolify/1",
+    "vbcdx.forgejo/1"
+  ],
+  "vars": {
+    "review_standards": {
+      "default": "the project's review guidelines",
+      "description": "Where the review and contribution standards live, as a phrase."
+    },
+    "issue_management": {
+      "default": "the team's issue conventions",
+      "description": "Where the issue-filing conventions live, as a phrase."
+    },
+    "human_account": {
+      "default": "the human decision-maker",
+      "description": "Who human-decision tickets are assigned to, as a phrase."
+    },
+    "park_label": {
+      "default": "the team's waiting-on-a-decision label",
+      "description": "The label that parks an item for a human decision, as a phrase."
+    }
+  }
+}

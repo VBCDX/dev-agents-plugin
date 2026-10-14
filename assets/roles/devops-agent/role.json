@@ -1,7 +1,6 @@
 {
   "schema_version": 1,
   "id": "devops-agent",
-  "source_id": "devops-agent",
   "credential_suffix": "DEVOPS_AGENT",
   "name": "DevOps Agent",
   "description": "Infrastructure provisioner that turns issues into host bootstrap scripts, PaaS docker-compose configs, code-host webhooks, and infra documentation on issue branches only — pattern-first, least-privilege, everything validated before push, and live infrastructure only ever WRITTEN, never executed, without explicit PM approval.",
@@ -18,6 +17,7 @@
     "web": true,
     "delegation": false
   },
+  "web_search": false,
   "remote_capabilities": {
     "forgejo": [
       "whoami",
@@ -36,6 +36,7 @@
       "list_pull_request_files",
       "get_pull_request_diff",
       "list_reviews",
+      "get_review",
       "list_commit_statuses",
       "list_workflow_runs",
       "get_workflow_run",

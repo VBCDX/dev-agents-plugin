@@ -12,9 +12,11 @@ None of the values below are real: they are placeholders. Replace them.
 ## Git host
 
 - **Host:** `<your git host, e.g. github.com / gitlab.com / your self-hosted URL>`
-- **Auto-close keywords:** `<Closes / Fixes>` — most hosts (GitHub, GitLab,
-  Gitea/Forgejo) auto-close an issue when a commit message on *any* branch
-  contains one of these followed by the issue number. This is why the skills
+- **Auto-close keywords:** `<Closes / Fixes>` — a closing keyword followed by
+  the issue number closes the issue. GitHub acts on it only when the change
+  merges into the default branch; Forgejo and Gitea act on it in a commit
+  message or a PR description, and their docs set no branch restriction, so a
+  keyword on a feature branch can close the issue early. This is why the skills
   say to write `Refs #N` instead when you only want to link, not close.
 
 ## Organizations / namespaces

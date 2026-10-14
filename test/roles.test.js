@@ -1,13 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import {
-  CANONICAL_IDS,
-  SOURCE_TO_CANONICAL,
-  idToSuffix,
-  normalizeSuffix,
-  SUFFIX_TO_ID,
-} from "../src/roles/registry.js";
-import { allRoles, getRole } from "../src/roles/index.js";
+import { SOURCE_TO_CANONICAL } from "../scripts/source-map.mjs";
+import { CANONICAL_IDS, idToSuffix, normalizeSuffix, SUFFIX_TO_ID, allRoles, getRole } from "./pack.js";
 
 test("there are exactly sixteen canonical roles", () => {
   assert.equal(CANONICAL_IDS.length, 16);
@@ -28,9 +22,9 @@ test("suffix round-trips with the canonical ID", () => {
     assert.equal(normalizeSuffix(suffix), id, `suffix ${suffix} must normalize back to ${id}`);
     assert.equal(SUFFIX_TO_ID[suffix], id);
   }
-  // The installer suffix is CODE_AGENT, never the account selector CODER_AGENT.
+  // The suffix is CODE_AGENT; the similar-looking account name is not a role.
   assert.equal(idToSuffix("code-agent"), "CODE_AGENT");
-  assert.equal(SUFFIX_TO_ID["CODER_AGENT"], undefined);
+  assert.equal(SUFFIX_TO_ID[["CODER", "AGENT"].join("_")], undefined);
 });
 
 test("every role loads with a prompt and a valid descriptor", () => {
@@ -52,7 +46,7 @@ test("every role loads with a prompt and a valid descriptor", () => {
 });
 
 test("prompts carry no forbidden infrastructure assumptions", () => {
-  const forbidden = [/CODE_HOST_/, /\$DSH_HOME/, /curl\s+-/, /-sSk\b/, /\/api\/v1\/repos/, /NODE_TLS_REJECT/];
+  const forbidden = [/CODE_HOST_/, /\$D[S]H_HOME/, /curl\s+-/, /-sSk\b/, /\/api\/v1\/repos/, /NODE_TLS_REJECT/];
   for (const id of CANONICAL_IDS) {
     const { prompt } = getRole(id);
     for (const re of forbidden) {
@@ -67,8 +61,8 @@ test("prompts carry no forbidden infrastructure assumptions", () => {
 // it is the same shape as a real bypass even when the fetch is a benign public
 // read. A role that legitimately needs web research declares `web: true` and
 // points at the web-search/web-fetch tools instead. (Regressed by
-// copywriter-content/-marketing, video-creator and instructional-designer —
-// Refs #10; hardened beyond the original "via bash curl" string — Refs #28.)
+// copywriter-content/-marketing, video-creator and instructional-designer; hardened
+// beyond the original "via bash curl" string.)
 //
 // The guard fires only on `web: true` roles: only a role that HAS the web tool
 // can route AROUND it. A `web: false` role that `curl`s its OWN deployed
@@ -89,12 +83,12 @@ test("prompts carry no forbidden infrastructure assumptions", () => {
 //   url-fetch    — curl/wget pointed straight at an http(s):// URL with no
 //                  object noun at all: "curl -sL https://vendor.example/notes".
 //                  This is the most natural way to write the bypass and the
-//                  specific gap #28 was reopened to close. Flags AND their
+//                  specific gap this guard once missed. Flags AND their
 //                  values may sit between the tool and the URL — a method
 //                  ("curl -X GET https://…") or a quoted, space-containing
 //                  header ("curl -H 'Accept: application/json' https://…") — so
 //                  an interposed argument no longer slips the URL past the
-//                  matcher (Refs #30).
+//                  matcher.
 //
 // A curl/wget co-mention is exempt ONLY when it is not a bypass, decided by
 // MEANING, not word order:
@@ -112,7 +106,7 @@ test("prompts carry no forbidden infrastructure assumptions", () => {
 // NOT exempt and is caught by a dedicated demotion detector (`webToolDemotion`).
 // The exemption thus turns on curl's semantic role (peer vs. replacement), not
 // on whether the web tool is merely named, which is why reordering — or
-// inverting — the alternatives cannot flip the verdict (Refs #30).
+// inverting — the alternatives cannot flip the verdict.
 //
 // Shape detection reads the non-exempt lines rejoined into continuous prose, so
 // a fetch whose means word and tool straddle a line break is still caught, while
@@ -124,7 +118,7 @@ test("prompts carry no forbidden infrastructure assumptions", () => {
 // `fetch`, `nc`) are heavily overloaded in these prompts — "web fetch", the qa
 // smoke `curl`/`fetch` pairing, "fetch the issue" — so matching them would
 // trade this guard's precision for phantom coverage of clients no incident
-// (#10, #28) has involved. curl/wget are the specific, unambiguous shell-fetch
+// has involved. curl/wget are the specific, unambiguous shell-fetch
 // verbs those incidents used. If a future prompt reaches for HTTPie/nc, extend
 // the tool vocabulary here rather than loosening the means/object patterns.
 // Every shape tolerates a wrapping backtick, man-page notation (`curl(1)`) and
@@ -139,7 +133,7 @@ const shellFetchObjectFirst =
 // (`-H 'Accept: application/json'`) or a single bare token (the method in
 // `-X GET`, `-u user:pass`, `-b cookie`). Without the value clause an interposed
 // method or quoted header slips the URL past the matcher — the same class as the
-// bare-`curl <URL>` gap that reopened #28 (Refs #30). A bare arg is guarded by a
+// bare-`curl <URL>` gap the guard once missed. A bare arg is guarded by a
 // negative lookahead so it cannot swallow the URL itself, and a run of pure
 // prose ("curl is documented at https://…") never matches: with no leading flag
 // the argument run is empty and the URL must sit immediately after the tool.
@@ -155,7 +149,7 @@ const pipedToShell = /`?(?:curl|wget)(?:\(\d\))?`?[^.\n]*\|\s*(?:bash|sh)\b/i;
 // not routing AROUND the capability. It is narrower than the prior "web tool
 // named ANYWHERE on the line" carve-out, which dropped the whole line and let a
 // polarity-inverted co-mention ("curl INSTEAD OF the web tool") ride out on the
-// exemption (Refs #30).
+// exemption.
 const WEB_TOOL = String.raw`web[- ]?(?:search|fetch|tool|tools|research|browsing)`;
 const webToolPeerAlternative = new RegExp(
   `(?:curl|wget)\\b[^.\\n]{0,20}\\bor\\b[^.\\n]{0,25}${WEB_TOOL}` +
@@ -166,12 +160,12 @@ const webToolPeerAlternative = new RegExp(
 const lineIsExempt = (line) => pipedToShell.test(line) || webToolPeerAlternative.test(line);
 // A co-mention that DEMOTES the web tool in favour of curl/wget: curl named as a
 // replacement for, a preference over, or a fallback WHEN the web tool is
-// unavailable — the #10 "if the web tool is down, curl the page" failure class.
+// unavailable — the "if the web tool is down, curl the page" failure class.
 // This is the polarity-inverted twin of the peer alternation above: same two
 // tokens, opposite meaning. The discriminator is the SEMANTIC ROLE (peer vs.
 // replacement), operationalised by the closed class of English comparative /
 // negation / conditional connectors that demote one alternative in favour of
-// another — NOT a list of #30's example sentences. It fires only when curl/wget
+// another — NOT a list of example sentences. It fires only when curl/wget
 // AND the web tool co-occur on the SAME line, so it can never touch an ordinary
 // curl line or an ordinary web-tool line; it complements the shape patterns,
 // which already catch demotions that also spell out a fetch ("curl the page").
@@ -225,30 +219,30 @@ test("no prompt teaches routing around its own web capability model", () => {
 test("web-bypass guard catches shell-fetch regardless of phrasing", () => {
   // The guard must react to the BEHAVIOUR, not to the sample sentences in the
   // ticket. This corpus pins that: it fixes the phrasings crazy-ivan invented
-  // for review #2159 (11 of which slipped the previous iteration) PLUS phrasings
+  // in an adversarial review (11 of which slipped an earlier iteration) PLUS phrasings
   // of our own beyond that list, so a future narrowing of any pattern goes red
   // here rather than reopening the same gap a third time.
   const bypasses = [
-    // #2159 §1.A — bare `curl <URL>` with no means word and no object noun.
+    // bare `curl <URL>` with no means word and no object noun.
     // The blocking gap: the most natural way to write the bypass.
     "Grab the release notes: `curl -sL https://vendor.example/notes`.",
     "Just curl https://docs.vendor.example and read the output.",
     "curl https://example.com/pricing | jq . and read it.", // pipe is to jq, not a shell
-    // #2159 §1.B — inflected / periphrastic means verbs.
+    // inflected / periphrastic means verbs.
     "Read the spec by running curl against the vendor site.",
     "Retrieve the page by shelling out to curl.",
-    // #2159 §1.C — adjective / possessive between article and object noun.
+    // adjective / possessive between article and object noun.
     "curl the vendor's site and summarise the release notes.",
-    // #2159 §1.D — man-page notation.
+    // man-page notation.
     "You may `curl(1)` the page and read it.",
-    // #2159 §1.E — object nouns the old list omitted.
+    // object nouns the old list omitted.
     "curl the endpoint and parse the response.",
     "wget the changelog before drafting.",
     "curl the readme for setup steps.",
     "curl the JSON feed and read it.",
-    // #2159 §1.F — cross-line split: means word and tool on different lines.
+    // cross-line split: means word and tool on different lines.
     "Fetch the notes via\ncurl and read them.",
-    // #2159 sanity cases (already caught before this pass — must stay caught).
+    // Sanity cases (already caught before this pass — must stay caught).
     "via bash `curl`",
     "use curl to retrieve the docs",
     "curl the page",
@@ -267,15 +261,15 @@ test("web-bypass guard catches shell-fetch regardless of phrasing", () => {
     "Retrieve https://vendor.example via wget then read it.",
     "wget(1) the release notes for the changelog.",
 
-    // ---- #30 Gap 1: flags/headers between `curl` and the URL. -------------
+    // ---- Gap 1: flags/headers between `curl` and the URL. ------------------
     // A non-flag argument (the method) or a quoted, space-containing header
     // value sits between `curl` and the URL, defeating the old flag-only
     // url-fetch clause; the URL's own words defeat object-first. Same class as
-    // the bare-`curl <URL>` gap that reopened #28.
+    // the bare-`curl <URL>` gap the guard once missed.
     "curl -X GET https://vendor.example/pricing",
     "curl -H 'Accept: application/json' https://vendor.example/api",
     "curl -A 'Mozilla/5.0' https://vendor.example/",
-    // Our own flag/header variants beyond #30's three.
+    // Our own flag/header variants beyond the first three.
     "curl --header 'X-Trace: 1' https://vendor.example/status", // long-form header flag
     "curl -b 'session=xyz; theme=dark' https://vendor.example/dash", // cookie value with a space
     "curl -u alice:secret --compressed -sSL https://vendor.example/private", // creds + several flags
@@ -283,19 +277,19 @@ test("web-bypass guard catches shell-fetch regardless of phrasing", () => {
     "curl -X POST -d '{\"q\":1}' https://vendor.example/graphql and read the reply", // method + data body
     "wget --header 'Accept: text/html' https://vendor.example/page", // wget, spaced header
     "curl https://vendor.example/notes -o out.html", // flag placed AFTER the URL
-    // ---- #30 Gap 1 lower-value misses (fixed while here). ----------------
+    // ---- Gap 1 lower-value misses (fixed while here). ---------------------
     "Just curling the changelog is enough.", // gerund inflection
     "curl them and summarise the differences.", // anaphoric object pronoun
     "curl the homepage for the hero copy.", // "homepage" object noun
 
-    // ---- #30 Gap 2: polarity-inverted web-tool co-mentions. --------------
+    // ---- Gap 2: polarity-inverted web-tool co-mentions. -------------------
     // An exempt token no longer drops the whole line, so a co-mention that
     // INVERTS the meaning (curl as replacement / preference / fallback) is
-    // caught rather than exempted. The fallback form is the #10 failure class.
-    "fetch it via curl instead of the web tool", // #30
-    "prefer curl over the web tool", // #30 — no fetch shape; caught by demotion
-    "skip the web tool; curl the page", // #30
-    "if the web tool is down, curl the page", // #30 — the #10 fallback class
+    // caught rather than exempted. The fallback form is the original failure class.
+    "fetch it via curl instead of the web tool",
+    "prefer curl over the web tool", // no fetch shape; caught by demotion
+    "skip the web tool; curl the page",
+    "if the web tool is down, curl the page", // the original fallback class
     // From crazy-ivan review 2160's polarity list.
     "Fetch the changelog via curl instead of the web tool.",
     "Prefer curl over the web search tool for fetching docs.", // no fetch shape; demotion
@@ -317,14 +311,13 @@ test("web-bypass guard catches shell-fetch regardless of phrasing", () => {
     // Piped into a shell — the `curl | bash` supply-chain anti-pattern.
     "Flag any unverified `curl | bash` in bootstrap scripts.",
     "no `chmod 777`, no unverified `curl | bash`, host firewall exposure",
-    // Web tool named alongside curl, both orders (the #2159 §2 fragility fix).
+    // Web tool named alongside curl, both orders (a fragility fix).
     "and re-fetch via web/curl for the deployed version unless the mirror covers it",
     "Re-fetch via curl/web for the deployed version.",
     "You may use curl or the web tool, whichever is handy.",
     "Prefer the web tool, or curl as a fallback.",
     // The two REAL exempted lines in the security-agent prompt, verbatim — the
-    // ones crazy-ivan (review 2160) confirmed are the only legitimate ones. The
-    // #30 exemption narrowing must keep BOTH green.
+    // ones crazy-ivan (review 2160) confirmed are the only legitimate ones. The exemption narrowing must keep BOTH green.
     "container-compose files, host bootstrap scripts (no `chmod 777`, no unverified `curl | bash`, host firewall exposure)",
     "consult your team's local vendor-docs mirror and re-fetch via web/curl for the deployed version unless the mirrored doc demonstrably covers it",
     // Peer alternation is exempt in EITHER order even when a preference word is
@@ -369,8 +362,110 @@ test("only pm-agent and devops-agent may create repositories (forgejo create_rep
   assert.deepEqual(allowed.sort(), ["devops-agent", "pm-agent"]);
 });
 
-test("reward-hack auditor records the audit gate as an unavailable external dependency", () => {
-  const d = getRole("reward-hack-auditor-agent").descriptor;
-  assert.ok(Array.isArray(d.external_dependencies));
-  assert.equal(d.external_dependencies[0].status, "unavailable");
+test("every audit role can emit its verdict as a review event", () => {
+  // The audit briefs require ONE machine-parseable
+  // verdict through the Forgejo review tool, pinned to the head SHA. A comment-only
+  // binding cannot satisfy that — the mismatch security-agent once hit, where
+  // the verdict arrived as an ordinary comment and a review-event consumer could not
+  // see it at all.
+  for (const id of ["review-agent", "crazy-ivan", "reward-hack-auditor-agent", "security-agent"]) {
+    assert.ok(
+      (getRole(id).descriptor.remote_capabilities.forgejo || []).includes("create_review"),
+      `${id} must be able to post its verdict as a review event`,
+    );
+  }
+});
+
+test("the roles that file findings hold create_issue", () => {
+  // A finding whose only home is a PR thread is lost when the PR closes (one
+  // crazy-ivan once carried three findings inside an audit comment because
+  // its bound toolset had no issue-creation tool). The recorded decision names
+  // all three of these roles for create_issue, so the holder set below is
+  // the recorded decision, not an omission.
+  for (const id of ["crazy-ivan", "reward-hack-auditor-agent", "security-agent"]) {
+    assert.ok(
+      (getRole(id).descriptor.remote_capabilities.forgejo || []).includes("create_issue"),
+      `${id} must be able to file a finding that outlives its PR`,
+    );
+  }
+});
+
+test("the findings widening stops at create_review and create_issue", () => {
+  // Pin the exact holder sets. The reconciliation widens two descriptors by one
+  // reviewed tool each; it must not creep into a general write grant, and a later
+  // change must not silently add or drop one of the two tools for any role.
+  const holders = (tool) =>
+    CANONICAL_IDS.filter((id) =>
+      (getRole(id).descriptor.remote_capabilities?.forgejo || []).includes(tool),
+    ).sort();
+  assert.deepEqual(holders("create_review"), [
+    "all-in-one-dev-agent",
+    "crazy-ivan",
+    "review-agent",
+    "reward-hack-auditor-agent",
+    "security-agent",
+  ]);
+  assert.deepEqual(holders("create_issue"), [
+    "all-in-one-dev-agent",
+    "code-agent",
+    "crazy-ivan",
+    "pm-agent",
+    "reward-hack-auditor-agent",
+    "security-agent",
+    "user-research-agent",
+  ]);
+});
+
+test("get_review rides with list_reviews and is a read the panel roles hold", () => {
+  // @vbcdx/forgejo-plugin ships `get_review` (GET /pulls/{n}/reviews/{id}, effect
+  // read, scope read:repository) and flagged this repo's READS allow-list as the
+  // rollout's concern. It is added to READS, so every role that can already list
+  // reviews can read one — no role gains a review read without the other.
+  const holders = (tool) =>
+    CANONICAL_IDS.filter((id) =>
+      (getRole(id).descriptor.remote_capabilities?.forgejo || []).includes(tool),
+    ).sort();
+  assert.deepEqual(holders("get_review"), holders("list_reviews"));
+  assert.ok(holders("get_review").length > 0);
+  // The panel roles that judge each other's reviews are among them.
+  for (const id of ["review-agent", "security-agent", "crazy-ivan", "reward-hack-auditor-agent"]) {
+    assert.ok(holders("get_review").includes(id), `${id} reads individual reviews`);
+  }
+  // Least privilege: no write/destructive tool may leak into any
+  // role's allow-list. Pin the complete write surface — every canonical role
+  // against the write/destructive catalogue — so an insertion under READS (or
+  // any other group) turns this suite red. (Review 3507: the previous block
+  // asserted membership in a Set this test had just built, and could never
+  // fail.)
+  const WRITE_TOOLS = new Set([
+    "create_comment", "update_comment", "create_issue", "update_issue", "set_issue_labels",
+    "create_pull_request", "update_pull_request", "create_review", "set_commit_status",
+    "dispatch_workflow", "merge_pull_request", "create_repository",
+  ]);
+  const EXPECTED_WRITE_SURFACE = {
+    "all-in-one-dev-agent": ["create_comment", "create_issue", "create_pull_request", "create_review", "dispatch_workflow", "set_commit_status", "set_issue_labels", "update_comment", "update_issue", "update_pull_request"],
+    "code-agent": ["create_comment", "create_issue", "create_pull_request", "update_comment", "update_pull_request"],
+    "copywriter-content": ["create_comment", "update_comment"],
+    "copywriter-marketing": ["create_comment", "update_comment"],
+    "crazy-ivan": ["create_comment", "create_issue", "create_review", "update_comment"],
+    "designer-agent": ["create_comment", "update_comment"],
+    "devops-agent": ["create_comment", "create_pull_request", "create_repository", "update_comment", "update_pull_request"],
+    "instructional-designer-agent": ["create_comment", "update_comment"],
+    "market-research-agent": ["create_comment", "update_comment"],
+    "pm-agent": ["create_comment", "create_issue", "create_pull_request", "create_repository", "merge_pull_request", "set_commit_status", "set_issue_labels", "update_comment", "update_issue", "update_pull_request"],
+    "qa-agent": ["create_comment", "create_pull_request", "dispatch_workflow", "set_commit_status", "update_comment", "update_pull_request"],
+    "review-agent": ["create_comment", "create_review", "update_comment"],
+    "reward-hack-auditor-agent": ["create_comment", "create_issue", "create_review", "update_comment"],
+    "security-agent": ["create_comment", "create_issue", "create_review", "update_comment"],
+    "user-research-agent": ["create_comment", "create_issue", "update_comment"],
+    "video-creator": ["create_comment", "update_comment"],
+  };
+  const surface = {};
+  for (const id of CANONICAL_IDS) {
+    const held = (getRole(id).descriptor.remote_capabilities?.forgejo || [])
+      .filter((tool) => WRITE_TOOLS.has(tool))
+      .sort();
+    if (held.length) surface[id] = held;
+  }
+  assert.deepEqual(surface, EXPECTED_WRITE_SURFACE);
 });

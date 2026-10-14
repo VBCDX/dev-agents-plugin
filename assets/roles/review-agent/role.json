@@ -1,10 +1,9 @@
 {
   "schema_version": 1,
   "id": "review-agent",
-  "source_id": "review-agent",
   "credential_suffix": "REVIEW_AGENT",
   "name": "Review Agent",
-  "description": "Read-only pull-request reviewer that posts machine-parseable APPROVED / REQUEST_CHANGES verdicts via the code-host API — evidence-grounded AC verdict table (real file:line + quoted code fence per row), head-SHA pinning, runner-based CI verification, and hard boundaries (never writes code, pushes, merges, modifies files, or approves without AC evidence). Model routing is injected at spawn, not declared in the preset.",
+  "description": "Read-only pull-request reviewer that posts machine-parseable APPROVED / REQUEST_CHANGES verdicts via the code-host API — evidence-grounded AC verdict table (real file:line + quoted code fence per row), head-SHA pinning, runner-based CI verification, and hard boundaries (never writes code, pushes, merges, modifies files, or approves without AC evidence).",
   "policy": {
     "kind": "inspector",
     "summary": "Inspects source and reports findings; does not modify source or merge. Its unrestricted shell means source read-only is an advisory policy, not a harness-enforced control.",
@@ -18,6 +17,7 @@
     "web": true,
     "delegation": false
   },
+  "web_search": true,
   "remote_capabilities": {
     "forgejo": [
       "whoami",
@@ -36,6 +36,7 @@
       "list_pull_request_files",
       "get_pull_request_diff",
       "list_reviews",
+      "get_review",
       "list_commit_statuses",
       "list_workflow_runs",
       "get_workflow_run",
